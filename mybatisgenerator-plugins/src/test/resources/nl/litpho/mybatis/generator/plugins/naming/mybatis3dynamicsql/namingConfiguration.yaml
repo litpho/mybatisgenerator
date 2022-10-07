@@ -1,0 +1,12 @@
+prefix: DB
+tables:
+  - name: TEST
+    type: MyTest
+    columns:
+      - name: CONTENT
+        property: inhoud
+  - name: TEST2
+    prefix: AB
+    columns:
+      - name: FLAG
+        type: boolean

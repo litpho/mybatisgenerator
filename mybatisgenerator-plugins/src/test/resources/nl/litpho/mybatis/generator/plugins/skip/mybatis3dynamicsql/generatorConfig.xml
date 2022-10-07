@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <context id="PTITables" targetRuntime="MyBatis3DynamicSql">
+        <plugin type="nl.litpho.mybatis.generator.plugins.skip.SkipPlugin">
+            <property name="configuration"
+                      value="src/test/resources/nl/litpho/mybatis/generator/plugins/skip/mybatis3dynamicsql/skipConfiguration.yaml"/>
+        </plugin>
+
+        <jdbcConnection driverClass="${driverClassName}"
+                        connectionURL="${jdbcUrl}"
+                        userId="${username}"
+                        password="${password}">
+        </jdbcConnection>
+
+        <javaTypeResolver type="nl.litpho.mybatis.generator.type.MybatisTypeResolver">
+            <property name="forceBigDecimals" value="false"/>
+            <property name="useJSR310Types" value="true"/>
+        </javaTypeResolver>
+
+        <javaModelGenerator targetPackage="nl.test.model"
+                            targetProject="${generatedSourceRoot}/java">
+            <property name="enableSubPackages" value="true"/>
+        </javaModelGenerator>
+
+        <sqlMapGenerator targetPackage="nl.test.client"
+                         targetProject="${generatedSourceRoot}/resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <javaClientGenerator type="XMLMAPPER"
+                             targetPackage="nl.test.client"
+                             targetProject="${generatedSourceRoot}/java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+        <table tableName="%" schema="PUBLIC">
+            <property name="ignoreQualifiersAtRuntime" value="true"/>
+        </table>
+    </context>
+
+</generatorConfiguration>

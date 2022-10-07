@@ -1,0 +1,6 @@
+ignoreTables:
+  - TEST2
+ignorePrefixes:
+  - PRE_
+ignoreSuffixes:
+  - _FIX
