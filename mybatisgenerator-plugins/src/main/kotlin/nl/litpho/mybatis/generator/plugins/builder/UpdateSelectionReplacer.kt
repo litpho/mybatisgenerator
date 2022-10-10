@@ -3,6 +3,7 @@ package nl.litpho.mybatis.generator.plugins.builder
 import nl.litpho.mybatis.generator.plugins.util.XmlUtil.findAttribute
 import nl.litpho.mybatis.generator.plugins.util.XmlUtil.findElement
 import nl.litpho.mybatis.generator.plugins.util.XmlUtil.findElements
+import nl.litpho.mybatis.generator.plugins.util.capitalize
 import org.mybatis.generator.api.IntrospectedTable
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType
 import org.mybatis.generator.api.dom.java.Method

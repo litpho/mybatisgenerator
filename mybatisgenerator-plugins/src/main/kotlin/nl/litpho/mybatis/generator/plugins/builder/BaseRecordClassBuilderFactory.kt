@@ -3,6 +3,7 @@ package nl.litpho.mybatis.generator.plugins.builder
 import nl.donna.generiek.mybatis.generator.util.PrimitiveUtil
 import nl.litpho.mybatis.generator.plugins.naming.NamingConfiguration
 import nl.litpho.mybatis.generator.plugins.naming.NamingConfigurationEntry
+import nl.litpho.mybatis.generator.plugins.util.capitalize
 import org.apache.ibatis.type.JdbcType
 import org.mybatis.generator.api.CommentGenerator
 import org.mybatis.generator.api.IntrospectedColumn
