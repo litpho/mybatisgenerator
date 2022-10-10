@@ -109,8 +109,15 @@ class BuilderPlugin : PluginAdapter() {
         return true
     }
 
+    override fun clientUpdateSelectiveColumnsMethodGenerated(method: Method, interfaze: Interface, introspectedTable: IntrospectedTable): Boolean =
+        context.targetRuntime == "MyBatis3"
+
     override fun contextGenerateAdditionalJavaFiles(introspectedTable: IntrospectedTable): List<GeneratedJavaFile> {
         val earlierFiles: MutableList<GeneratedJavaFile>? = super.contextGenerateAdditionalJavaFiles(introspectedTable)
+        if (context.targetRuntime != "Mybatis3") {
+            return mutableListOf()
+        }
+
         val skipPluginConfiguration = ConfigurationUtil.getPluginConfigurationNull<SkipPluginConfiguration>()
         if (skipPluginConfiguration != null && skipPluginConfiguration.isIgnored(introspectedTable)) {
             return mutableListOf()
@@ -157,10 +164,13 @@ class BuilderPlugin : PluginAdapter() {
         return super.contextGenerateAdditionalJavaFiles()
     }
 
-    private fun replaceMethod(introspectedTable: IntrospectedTable, method: Method): Boolean {
-        UpdateSelectionReplacer.replaceMethod(method, introspectedTable)
-        return true
-    }
+    private fun replaceMethod(introspectedTable: IntrospectedTable, method: Method): Boolean =
+        if (context.targetRuntime == "Mybatis3") {
+            UpdateSelectionReplacer.replaceMethod(method, introspectedTable)
+            true
+        } else {
+            false
+        }
 
 //    private fun replaceEnumValue(topLevelClass: TopLevelClass, domeinEnumPluginConfiguration: DomeinEnumPluginConfiguration) {
 //        val constructor = getConstructor(topLevelClass)
