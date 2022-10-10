@@ -37,6 +37,7 @@ class BaseRecordClassBuilderFactory(
 //        topLevelClass.addImportedType("javax.annotation.concurrent.Immutable")
         createOrChangeNoArgConstructor(makeConstructorPrivate)
         createFullConstructor(targetRuntime)
+        createBuilderInstanceMethod()
         createBuilderMethod()
         createBuilderFromDtoMethod()
         createBuilderClass(usePrimitivesWherePossible, methodPrefix, useIdGenerators)
@@ -168,6 +169,16 @@ class BaseRecordClassBuilderFactory(
         } else {
             this
         }
+
+    private fun createBuilderInstanceMethod() {
+        val method = Method("toBuilder").apply {
+            setReturnType(FullyQualifiedJavaType("Builder"))
+            addBodyLine("return builder(this);")
+            visibility = JavaVisibility.PUBLIC
+        }
+        commentGenerator.addGeneralMethodComment(method, introspectedTable)
+        topLevelClass.addMethod(method)
+    }
 
     private fun createBuilderMethod() {
         val method = Method("builder").apply {
