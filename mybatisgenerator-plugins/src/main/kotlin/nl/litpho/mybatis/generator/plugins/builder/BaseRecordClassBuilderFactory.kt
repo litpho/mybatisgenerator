@@ -279,9 +279,9 @@ class BaseRecordClassBuilderFactory(
                 val columnType = introspectedColumn.bepaalColumnType(useIdGenerators)
                 Field(introspectedColumn.javaProperty, columnType).apply {
                     visibility = JavaVisibility.PRIVATE
-//                    if (tableConfiguration?.columnDefaultValues?.containsKey(introspectedColumn.actualColumnName) == true) {
-//                        setInitializationString(bepaalInitializationString(tableConfiguration, introspectedColumn, columnType))
-//                    }
+                    if (tableConfiguration?.columnDefaultValues?.containsKey(introspectedColumn.actualColumnName) == true) {
+                        setInitializationString(bepaalInitializationString(tableConfiguration, introspectedColumn, columnType))
+                    }
                 }
             }
 
@@ -304,18 +304,18 @@ class BaseRecordClassBuilderFactory(
             }
         }
 
-//    private fun bepaalInitializationString(
-//        tableConfiguration: NamingConfigurationEntry,
-//        introspectedColumn: IntrospectedColumn,
-//        columnType: FullyQualifiedJavaType
-//    ): String? =
-//        tableConfiguration.columnDefaultValues[introspectedColumn.actualColumnName].run {
-//            if (columnType == FullyQualifiedJavaType.getStringInstance()) {
-//                "\"$this\""
-//            } else {
-//                this
-//            }
-//        }
+    private fun bepaalInitializationString(
+        tableConfiguration: NamingConfigurationEntry,
+        introspectedColumn: IntrospectedColumn,
+        columnType: FullyQualifiedJavaType
+    ): String? =
+        tableConfiguration.columnDefaultValues[introspectedColumn.actualColumnName].run {
+            if (columnType == FullyQualifiedJavaType.getStringInstance()) {
+                "\"$this\""
+            } else {
+                this
+            }
+        }
 
     private fun isColumnNeedsValideer(introspectedColumn: IntrospectedColumn): Boolean =
         !introspectedColumn.isNullable && introspectedColumn.fullyQualifiedJavaType.isPrimitive && (introspectedColumn.defaultValue?.isBlank() ?: false)

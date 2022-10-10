@@ -49,8 +49,8 @@ class NamingConfigurationEntry(
 ) {
     val columnOverrides: Map<String, ColumnBasedJavaPropertyOverride> =
         columns.associate { it.name!! to ColumnBasedJavaPropertyOverride(it.property, it.type) }
-//        val columnDefaultValues: Map<String, String> =
-//            columns.filter { it.defaultValue != null }.associate { it.name!! to it.defaultValue!! }
+    val columnDefaultValues: Map<String, String> =
+        columns.filter { it.defaultValue != null }.associate { it.name!! to it.defaultValue!! }
 }
 
 class ColumnBasedJavaPropertyOverride(private val property: String?, private val type: String?) {
