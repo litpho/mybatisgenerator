@@ -1,4 +1,4 @@
-package nl.donna.generiek.mybatis.generator.util
+package nl.litpho.mybatis.generator.plugins.util
 
 import org.mybatis.generator.api.IntrospectedColumn
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType

@@ -1,6 +1,6 @@
 package nl.litpho.mybatis.generator.plugins.builder
 
-import nl.donna.generiek.mybatis.generator.util.PrimitiveUtil.getPrimitive
+import nl.litpho.mybatis.generator.plugins.util.PrimitiveUtil.getPrimitive
 import org.mybatis.generator.api.CommentGenerator
 import org.mybatis.generator.api.IntrospectedColumn
 import org.mybatis.generator.api.IntrospectedTable
@@ -17,8 +17,10 @@ object PrimaryKeyClassBuilderFactory {
         val commentGenerator: CommentGenerator = DefaultCommentGenerator()
         createNoArgConstructor(topLevelClass, introspectedTable, commentGenerator)
         createFullConstructor(topLevelClass, introspectedTable, commentGenerator, usePrimitivesWherePossible)
-        topLevelClass.addImportedType("javax.annotation.Nullable")
-        topLevelClass.addImportedType("nl.donna.generiek.valideer.Valideer")
+        with(topLevelClass) {
+            addImportedType("javax.annotation.Nullable")
+            addStaticImport("java.util.Objects.requireNonNull")
+        }
     }
 
     private fun createNoArgConstructor(topLevelClass: TopLevelClass, introspectedTable: IntrospectedTable, commentGenerator: CommentGenerator) {
@@ -52,7 +54,7 @@ object PrimaryKeyClassBuilderFactory {
         }
         for (introspectedColumn: IntrospectedColumn in introspectedTable.primaryKeyColumns) {
             if (!introspectedColumn.isNullable && !getPrimitive(introspectedColumn, usePrimitivesWherePossible, false).isPrimitive) {
-                constructor.addBodyLine("Valideer.notNull(\"${introspectedColumn.javaProperty}\", ${introspectedColumn.javaProperty});")
+                constructor.addBodyLine("requireNonNull(${introspectedColumn.javaProperty}, \"${introspectedColumn.javaProperty} should not be null\");")
             }
         }
         for (introspectedColumn: IntrospectedColumn in introspectedTable.primaryKeyColumns) {

@@ -1,8 +1,8 @@
 package nl.litpho.mybatis.generator.plugins.builder
 
-import nl.donna.generiek.mybatis.generator.util.PrimitiveUtil
 import nl.litpho.mybatis.generator.plugins.naming.NamingConfiguration
 import nl.litpho.mybatis.generator.plugins.naming.NamingConfigurationEntry
+import nl.litpho.mybatis.generator.plugins.util.PrimitiveUtil
 import nl.litpho.mybatis.generator.plugins.util.capitalize
 import org.apache.ibatis.type.JdbcType
 import org.mybatis.generator.api.CommentGenerator
@@ -33,8 +33,6 @@ class BaseRecordClassBuilderFactory(
         useIdGenerators: Boolean,
         targetRuntime: String
     ) {
-//        topLevelClass.addAnnotation("@Immutable")
-//        topLevelClass.addImportedType("javax.annotation.concurrent.Immutable")
         createOrChangeNoArgConstructor(makeConstructorPrivate)
         createFullConstructor(targetRuntime)
         createBuilderInstanceMethod()
@@ -99,21 +97,21 @@ class BaseRecordClassBuilderFactory(
     private fun getConstructorBodyLines(columns: List<IntrospectedColumn>): List<String> = columns.flatMap { getConstructorBodyLine(it) }
 
     private fun getConstructorBodyLine(introspectedColumn: IntrospectedColumn): List<String> {
-        val prefix: String = "this." + introspectedColumn.javaProperty + " = "
-        val toekenning = if (introspectedColumn.isNullable || introspectedColumn.fullyQualifiedJavaType.isPrimitive) {
+        val prefix = "this." + introspectedColumn.javaProperty + " = "
+        val initialization = if (introspectedColumn.isNullable || introspectedColumn.fullyQualifiedJavaType.isPrimitive) {
             prefix + introspectedColumn.javaProperty + ";"
         } else {
             ("${prefix}requireNonNull(${introspectedColumn.javaProperty}, \"${introspectedColumn.javaProperty} should not be null\");")
         }
-        return listOf(toekenning)
+        return listOf(initialization)
     }
 
-    private fun bepaalDefaultValue(introspectedColumn: IntrospectedColumn): String {
+    private fun determineDefaultValue(introspectedColumn: IntrospectedColumn): String {
         val defaultValue = introspectedColumn.defaultValue.removeQuotes()
         val fullyQualifiedName = introspectedColumn.fullyQualifiedJavaType.fullyQualifiedName
         return when (introspectedColumn.fullyQualifiedJavaType.fullyQualifiedName) {
             "java.lang.String" -> "\"" + defaultValue + "\""
-            "java.lang.Boolean", "boolean" -> bepaalDefaultValueBoolean(introspectedColumn, defaultValue)
+            "java.lang.Boolean", "boolean" -> determineDefaultBooleanValue(introspectedColumn, defaultValue)
             "java.lang.Long", "long" -> "${defaultValue}L"
             "java.math.BigInteger" ->
                 when (defaultValue) {
@@ -127,29 +125,29 @@ class BaseRecordClassBuilderFactory(
                     else -> "BigDecimal.valueOf(${defaultValue}L)"
                 }
 
-            else -> bepaalDefaultValueNamingOverride(fullyQualifiedName, introspectedColumn, defaultValue)
+            else -> determineDefaultValueNamingOverride(fullyQualifiedName, introspectedColumn, defaultValue)
         }
     }
 
-    private fun bepaalDefaultValueBoolean(introspectedColumn: IntrospectedColumn, defaultValue: String) =
+    private fun determineDefaultBooleanValue(introspectedColumn: IntrospectedColumn, defaultValue: String) =
         when (introspectedColumn.jdbcType) {
             JdbcType.BOOLEAN.TYPE_CODE -> defaultValue.lowercase()
             JdbcType.CHAR.TYPE_CODE, JdbcType.VARCHAR.TYPE_CODE ->
                 when (defaultValue) {
-                    "J" -> "true"
+                    "Y" -> "true"
                     "N" -> "false"
-                    else -> throw IllegalStateException("Ongeldige defaultwaarde voor Ja/Nee boolean '$defaultValue' - ${introspectedColumn.actualColumnName}")
+                    else -> throw IllegalStateException("Invalid default value for yes/no boolean '$defaultValue' - ${introspectedColumn.actualColumnName}")
                 }
 
             else ->
                 when (defaultValue) {
                     "1" -> "true"
                     "0" -> "false"
-                    else -> throw IllegalStateException("Ongeldige defaultwaarde voor Ja/Nee boolean '$defaultValue' - ${introspectedColumn.actualColumnName}")
+                    else -> throw IllegalStateException("Invalid default value for 0/1 boolean '$defaultValue' - ${introspectedColumn.actualColumnName}")
                 }
         }
 
-    private fun bepaalDefaultValueNamingOverride(fullyQualifiedName: String, introspectedColumn: IntrospectedColumn, defaultValue: String) =
+    private fun determineDefaultValueNamingOverride(fullyQualifiedName: String, introspectedColumn: IntrospectedColumn, defaultValue: String) =
         if (namingConfiguration != null) {
             val namingConfigurationEntry =
                 namingConfiguration.getParseResultForType(introspectedColumn.fullyQualifiedJavaType.shortName)
@@ -243,7 +241,7 @@ class BaseRecordClassBuilderFactory(
         for (introspectedColumn: IntrospectedColumn in introspectedTable.allColumns) {
             val method = Method(methodPrefix + introspectedColumn.javaProperty.capitalize()).apply {
                 setReturnType(FullyQualifiedJavaType("Builder"))
-                addParameter(bepaalParameter(introspectedColumn, usePrimitivesWherePossible))
+                addParameter(createParameter(introspectedColumn, usePrimitivesWherePossible))
                 addBodyLine("this.${introspectedColumn.javaProperty} = ${introspectedColumn.javaProperty};")
                 addBodyLine("return this;")
                 visibility = JavaVisibility.PUBLIC
@@ -262,21 +260,21 @@ class BaseRecordClassBuilderFactory(
         if (useIdGenerators && introspectedTable.primaryKeyColumns.size == 1) {
             val pkColumn = introspectedTable.primaryKeyColumns[0]
             topLevelClass.addImportedType(FullyQualifiedJavaType("nl.litpho.mybatis.idgenerators.IdGenerators"))
-            val pkType = pkColumn.bepaalColumnType()
+            val pkType = pkColumn.determineColumnType()
             method.addBodyLine("if (this.${pkColumn.javaProperty} == null && IdGenerators.supports(${pkType.shortName}.class)) {")
             method.addBodyLine("this.${pkColumn.javaProperty} = IdGenerators.get(${pkType.shortName}.class);")
             method.addBodyLine("}")
         }
 
         for (introspectedColumn: IntrospectedColumn in introspectedTable.allColumns) {
-            if (isColumnNeedsValideer(introspectedColumn)) {
+            if (doesColumnNeedsNonNullCheck(introspectedColumn)) {
                 method.addBodyLine("requireNonNull(${introspectedColumn.javaProperty}, \"${introspectedColumn.javaProperty} should not be null\");")
             }
         }
         for (introspectedColumn: IntrospectedColumn in introspectedTable.nonPrimaryKeyColumns) {
             if (introspectedColumn.defaultValue != null) {
                 method.addBodyLine("if (${introspectedColumn.javaProperty} == null) {")
-                method.addBodyLine("this.${introspectedColumn.javaProperty} = ${bepaalDefaultValue(introspectedColumn)};")
+                method.addBodyLine("this.${introspectedColumn.javaProperty} = ${determineDefaultValue(introspectedColumn)};")
                 method.addBodyLine("}")
             }
         }
@@ -288,16 +286,16 @@ class BaseRecordClassBuilderFactory(
     private fun createBuilderClassFields(useIdGenerators: Boolean, tableConfiguration: NamingConfigurationEntry?): List<Field> =
         introspectedTable.allColumns
             .map { introspectedColumn ->
-                val columnType = introspectedColumn.bepaalColumnType(useIdGenerators)
+                val columnType = introspectedColumn.determineColumnType(useIdGenerators)
                 Field(introspectedColumn.javaProperty, columnType).apply {
                     visibility = JavaVisibility.PRIVATE
                     if (tableConfiguration?.columnDefaultValues?.containsKey(introspectedColumn.actualColumnName) == true) {
-                        setInitializationString(bepaalInitializationString(tableConfiguration, introspectedColumn, columnType))
+                        setInitializationString(determineInitializationString(tableConfiguration, introspectedColumn, columnType))
                     }
                 }
             }
 
-    private fun bepaalParameter(introspectedColumn: IntrospectedColumn, usePrimitivesWherePossible: Boolean): Parameter =
+    private fun createParameter(introspectedColumn: IntrospectedColumn, usePrimitivesWherePossible: Boolean): Parameter =
         Parameter(
             PrimitiveUtil.getPrimitive(introspectedColumn, usePrimitivesWherePossible, false),
             introspectedColumn.javaProperty
@@ -307,7 +305,7 @@ class BaseRecordClassBuilderFactory(
             }
         }
 
-    private fun IntrospectedColumn.bepaalColumnType(useIdGenerators: Boolean = true): FullyQualifiedJavaType =
+    private fun IntrospectedColumn.determineColumnType(useIdGenerators: Boolean = true): FullyQualifiedJavaType =
         fullyQualifiedJavaType.run {
             if (useIdGenerators && isPrimitive) {
                 primitiveTypeWrapper
@@ -316,7 +314,7 @@ class BaseRecordClassBuilderFactory(
             }
         }
 
-    private fun bepaalInitializationString(
+    private fun determineInitializationString(
         tableConfiguration: NamingConfigurationEntry,
         introspectedColumn: IntrospectedColumn,
         columnType: FullyQualifiedJavaType
@@ -329,7 +327,7 @@ class BaseRecordClassBuilderFactory(
             }
         }
 
-    private fun isColumnNeedsValideer(introspectedColumn: IntrospectedColumn): Boolean =
+    private fun doesColumnNeedsNonNullCheck(introspectedColumn: IntrospectedColumn): Boolean =
         !introspectedColumn.isNullable && introspectedColumn.fullyQualifiedJavaType.isPrimitive && (introspectedColumn.defaultValue?.isBlank() ?: false)
 
     private fun getGetterMethod(introspectedColumn: IntrospectedColumn): String {

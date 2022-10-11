@@ -28,43 +28,37 @@ open class SkipPlugin : PluginAdapter() {
         topLevelClass: TopLevelClass,
         introspectedTable: IntrospectedTable
     ): Boolean =
-        super.modelBaseRecordClassGenerated(topLevelClass, introspectedTable) && !configuration.isIgnored(
-            introspectedTable
-        )
+        super.modelBaseRecordClassGenerated(topLevelClass, introspectedTable) &&
+            !configuration.isIgnored(introspectedTable)
 
     override fun kotlinDataClassGenerated(
         kotlinFile: KotlinFile,
         dataClass: KotlinType,
         introspectedTable: IntrospectedTable
     ): Boolean =
-        super.kotlinDataClassGenerated(kotlinFile, dataClass, introspectedTable) && !configuration.isIgnored(
-            introspectedTable
-        )
+        super.kotlinDataClassGenerated(kotlinFile, dataClass, introspectedTable) &&
+            !configuration.isIgnored(introspectedTable)
 
     override fun modelRecordWithBLOBsClassGenerated(
         topLevelClass: TopLevelClass,
         introspectedTable: IntrospectedTable
     ): Boolean =
-        super.modelRecordWithBLOBsClassGenerated(topLevelClass, introspectedTable) && !configuration.isIgnored(
-            introspectedTable
-        )
+        super.modelRecordWithBLOBsClassGenerated(topLevelClass, introspectedTable) &&
+            !configuration.isIgnored(introspectedTable)
 
     override fun modelExampleClassGenerated(
         topLevelClass: TopLevelClass,
         introspectedTable: IntrospectedTable
     ): Boolean =
-        super.modelExampleClassGenerated(
-            topLevelClass,
-            introspectedTable
-        ) && !configuration.isIgnored(introspectedTable)
+        super.modelExampleClassGenerated(topLevelClass, introspectedTable) &&
+            !configuration.isIgnored(introspectedTable)
 
     override fun modelPrimaryKeyClassGenerated(
         topLevelClass: TopLevelClass,
         introspectedTable: IntrospectedTable
     ): Boolean =
-        super.modelPrimaryKeyClassGenerated(topLevelClass, introspectedTable) && !configuration.isIgnored(
-            introspectedTable
-        )
+        super.modelPrimaryKeyClassGenerated(topLevelClass, introspectedTable) &&
+            !configuration.isIgnored(introspectedTable)
 
     override fun sqlMapGenerated(sqlMap: GeneratedXmlFile, introspectedTable: IntrospectedTable): Boolean =
         super.sqlMapGenerated(sqlMap, introspectedTable) && !configuration.isIgnored(introspectedTable)

@@ -1,10 +1,10 @@
 package nl.litpho.mybatis.generator.plugins.builder
 
-import nl.donna.generiek.mybatis.generator.util.PrimitiveUtil.replaceGetterReturnTypeWithPrimitive
-import nl.donna.generiek.mybatis.generator.util.PrimitiveUtil.replaceSetterParameterTypeWithPrimitive
 import nl.litpho.mybatis.generator.plugins.naming.NamingConfiguration
 import nl.litpho.mybatis.generator.plugins.skip.SkipPluginConfiguration
 import nl.litpho.mybatis.generator.plugins.util.ConfigurationUtil
+import nl.litpho.mybatis.generator.plugins.util.PrimitiveUtil.replaceGetterReturnTypeWithPrimitive
+import nl.litpho.mybatis.generator.plugins.util.PrimitiveUtil.replaceSetterParameterTypeWithPrimitive
 import org.mybatis.generator.api.GeneratedJavaFile
 import org.mybatis.generator.api.IntrospectedColumn
 import org.mybatis.generator.api.IntrospectedTable
@@ -197,10 +197,10 @@ class BuilderPlugin : PluginAdapter() {
     private fun getConstructor(topLevelClass: TopLevelClass): Method =
         topLevelClass.methods
             .filter(Method::isConstructor)
-            .firstOrNull { it.parameters.isNotEmpty() } ?: throw IllegalStateException("There has to be a constructor")
+            .firstOrNull { it.parameters.isNotEmpty() } ?: throw IllegalStateException("No constructor with arguments was found")
 
     private fun getBuildMethod(builderClass: InnerClass): Method =
-        builderClass.methods.firstOrNull { (it.name == "build") } ?: throw IllegalStateException("Er moet een build method zijn")
+        builderClass.methods.firstOrNull { (it.name == "build") } ?: throw IllegalStateException("No build method was found")
 
     private fun findBodyLineIndexesToReplace(bodyLines: List<String>): IntStream =
         IntStream.range(0, bodyLines.size).filter { i: Int -> bodyLines[i].contains(DOLLAR_ENUM_DOLLAR) }
