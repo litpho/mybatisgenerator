@@ -21,7 +21,8 @@ data class NamingYaml(var prefix: String? = null, var tables: MutableList<TableD
         var name: String? = null,
         var type: String? = null,
         var property: String? = null,
-        var defaultValue: String? = null
+        var defaultValue: String? = null,
+        var ignore: Boolean = false
     )
 }
 
@@ -51,6 +52,8 @@ class NamingConfigurationEntry(
         columns.associate { it.name!! to ColumnBasedJavaPropertyOverride(it.property, it.type) }
     val columnDefaultValues: Map<String, String> =
         columns.filter { it.defaultValue != null }.associate { it.name!! to it.defaultValue!! }
+    val ignoredColumns: List<String> =
+        columns.filter { !it.ignore }.map { it.name!! }.toList()
 }
 
 class ColumnBasedJavaPropertyOverride(private val property: String?, private val type: String?) {

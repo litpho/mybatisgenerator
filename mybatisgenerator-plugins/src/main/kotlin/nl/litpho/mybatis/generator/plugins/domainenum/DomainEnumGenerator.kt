@@ -125,8 +125,8 @@ class DomainEnumGenerator(
         val topLevelEnumeration = TopLevelEnumeration(enumType).apply {
             visibility = JavaVisibility.PUBLIC
         }
-        val superInterface = FullyQualifiedJavaType("nl.donna.mybatis.enumsupport.EnumeratiewaardeEnum")
-        val extendsInterface = FullyQualifiedJavaType("EnumeratiewaardeEnum")
+        val superInterface = FullyQualifiedJavaType("nl.litpho.mybatis.enumsupport.DatabaseValueEnum")
+        val extendsInterface = FullyQualifiedJavaType("DatabaseValueEnum")
         topLevelEnumeration.addSuperInterface(extendsInterface)
         topLevelEnumeration.addImportedType(superInterface)
         if (!CODE.equals(tableDefinition.valueColumn, ignoreCase = true)) {
@@ -170,16 +170,16 @@ class DomainEnumGenerator(
                 isStatic = true
                 setReturnType(enumType)
                 addParameter(Parameter(FullyQualifiedJavaType.getStringInstance(), "databaseValue"))
-                addBodyLine("Valideer.notNull(\"databaseValue\", databaseValue);")
+                addBodyLine("requireNonNull(databaseValue, \"databaseValue\");")
                 addBodyLine("return Arrays.stream(values())")
                 addBodyLine("\t.filter(value -> value.getDatabaseValue().equals(databaseValue))")
                 addBodyLine("\t.findFirst()")
-                addBodyLine("\t.orElseThrow(() -> new IllegalArgumentException(\"${enumType.shortName}\" + databaseValue + \" bestaat niet\"));")
+                addBodyLine("\t.orElseThrow(() -> new IllegalArgumentException(\"${enumType.shortName}\" + databaseValue + \" does not exist\"));")
             }
             with(topLevelEnumeration) {
                 addMethod(getByDatabaseValueMethod)
                 addImportedType(FullyQualifiedJavaType("java.util.Arrays"))
-                addImportedType(FullyQualifiedJavaType("nl.donna.generiek.valideer.Valideer"))
+                addStaticImport("java.util.Objects.requireNonNull")
             }
             addConstructorToToplevelEnumeration(topLevelEnumeration, enumType, parameterColumns, commentGenerator)
         }
