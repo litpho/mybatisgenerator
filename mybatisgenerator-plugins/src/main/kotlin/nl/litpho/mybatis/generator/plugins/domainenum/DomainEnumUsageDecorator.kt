@@ -2,6 +2,7 @@ package nl.litpho.mybatis.generator.plugins.domainenum
 
 import nl.litpho.mybatis.generator.plugins.naming.NamingConfiguration
 import nl.litpho.mybatis.generator.plugins.naming.NamingConfigurationEntry
+import nl.litpho.mybatis.generator.plugins.subpackage.SubpackageConfiguration
 import org.mybatis.generator.api.IntrospectedColumn
 import org.mybatis.generator.api.IntrospectedTable
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType
@@ -15,9 +16,8 @@ class DomainEnumUsageDecorator(private val introspectedTable: IntrospectedTable,
 
     fun useDomainEnums(
         domainEnumConfiguration: DomainEnumConfiguration,
-        namingConfiguration: NamingConfiguration
-//        ,
-//        subPackagePluginConfiguration: SubPackageConfiguration?
+        namingConfiguration: NamingConfiguration,
+        subpackageConfiguration: SubpackageConfiguration?
     ) {
         try {
             context.connection.use { conn ->
@@ -32,9 +32,8 @@ class DomainEnumUsageDecorator(private val introspectedTable: IntrospectedTable,
                                 getEnumType(
                                     pktableName,
                                     domainEnumConfiguration,
-                                    namingConfiguration
-//                                    ,
-//                                    subPackagePluginConfiguration
+                                    namingConfiguration,
+                                    subpackageConfiguration
                                 )
                             )
                         }
@@ -49,11 +48,10 @@ class DomainEnumUsageDecorator(private val introspectedTable: IntrospectedTable,
     private fun getEnumType(
         enumTableName: String,
         domainEnumPluginConfiguration: DomainEnumConfiguration,
-        namingConfiguration: NamingConfiguration?
-//        ,
-//        subPackagePluginConfiguration: SubPackagePluginConfiguration?
+        namingConfiguration: NamingConfiguration?,
+        subpackageConfiguration: SubpackageConfiguration?
     ): String {
-        val pakkage: String = determinePackage(enumTableName, domainEnumPluginConfiguration) // , subPackagePluginConfiguration)
+        val pakkage: String = determinePackage(enumTableName, domainEnumPluginConfiguration, subpackageConfiguration)
         if (namingConfiguration != null) {
             val parseResultForTable: NamingConfigurationEntry? = namingConfiguration.getTableConfiguration(enumTableName)
             if (parseResultForTable?.type != null) {
@@ -76,16 +74,15 @@ class DomainEnumUsageDecorator(private val introspectedTable: IntrospectedTable,
 
     private fun determinePackage(
         enumTableName: String,
-        domainEnumConfiguration: DomainEnumConfiguration
-//        ,
-//        subPackagePluginConfiguration: SubPackagePluginConfiguration?
+        domainEnumConfiguration: DomainEnumConfiguration,
+        subpackageConfiguration: SubpackageConfiguration?
     ): String =
         domainEnumConfiguration.targetPackage.run {
-//            val subPackage = subPackagePluginConfiguration?.getSubpackage(enumTableName)
-//            if (subPackage?.isNotEmpty() == true) {
-//                "$this.$subPackage"
-//            } else {
-            this
-//            }
+            val subPackage = subpackageConfiguration?.getSubpackage(enumTableName)
+            if (subPackage?.isNotEmpty() == true) {
+                "$this.$subPackage"
+            } else {
+                this
+            }
         }
 }

@@ -3,6 +3,7 @@ package nl.litpho.mybatis.generator.plugins.domainenum
 import nl.litpho.mybatis.generator.plugins.domainenum.DomainEnumGenerator.Companion.createDomeinEnumForTable
 import nl.litpho.mybatis.generator.plugins.domainenum.DomainEnumGenerator.Companion.createTypedDomeinEnumTables
 import nl.litpho.mybatis.generator.plugins.naming.NamingConfiguration
+import nl.litpho.mybatis.generator.plugins.subpackage.SubpackageConfiguration
 import nl.litpho.mybatis.generator.plugins.util.ConfigurationUtil
 import nl.litpho.mybatis.generator.plugins.util.readConfigurationFromYaml
 import org.mybatis.generator.api.GeneratedJavaFile
@@ -32,9 +33,9 @@ class DomainEnumPlugin : PluginAdapter() {
         super.initialized(introspectedTable)
 
         val namingConfiguration = ConfigurationUtil.getPluginConfigurationRequired<NamingConfiguration>()
-//        val subPackagePluginConfiguration = ConfigurationUtil.getPluginConfigurationRequired<SubpackageConfiguration>()
+        val subpackageConfiguration = ConfigurationUtil.getPluginConfigurationNull<SubpackageConfiguration>()
         val domainEnumUsageDecorator = DomainEnumUsageDecorator(introspectedTable, context)
-        domainEnumUsageDecorator.useDomainEnums(configuration, namingConfiguration) // , subPackagePluginConfiguration)
+        domainEnumUsageDecorator.useDomainEnums(configuration, namingConfiguration, subpackageConfiguration)
     }
 
     override fun contextGenerateAdditionalJavaFiles(introspectedTable: IntrospectedTable): List<GeneratedJavaFile> {

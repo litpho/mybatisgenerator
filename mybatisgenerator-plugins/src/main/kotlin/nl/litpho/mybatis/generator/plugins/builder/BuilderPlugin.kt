@@ -1,7 +1,7 @@
 package nl.litpho.mybatis.generator.plugins.builder
 
 import nl.litpho.mybatis.generator.plugins.naming.NamingConfiguration
-import nl.litpho.mybatis.generator.plugins.skip.SkipPluginConfiguration
+import nl.litpho.mybatis.generator.plugins.skip.SkipConfiguration
 import nl.litpho.mybatis.generator.plugins.util.ConfigurationUtil
 import nl.litpho.mybatis.generator.plugins.util.PrimitiveUtil.replaceGetterReturnTypeWithPrimitive
 import nl.litpho.mybatis.generator.plugins.util.PrimitiveUtil.replaceSetterParameterTypeWithPrimitive
@@ -118,8 +118,8 @@ class BuilderPlugin : PluginAdapter() {
             return mutableListOf()
         }
 
-        val skipPluginConfiguration = ConfigurationUtil.getPluginConfigurationNull<SkipPluginConfiguration>()
-        if (skipPluginConfiguration != null && skipPluginConfiguration.isIgnored(introspectedTable)) {
+        val skipConfiguration = ConfigurationUtil.getPluginConfigurationNull<SkipConfiguration>()
+        if (skipConfiguration != null && skipConfiguration.isIgnored(introspectedTable)) {
             return mutableListOf()
         }
 

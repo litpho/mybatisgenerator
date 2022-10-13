@@ -8,10 +8,10 @@ data class SkipYaml(
     var ignoreSuffixes: MutableList<String> = mutableListOf(),
     var ignoreTables: MutableList<String> = mutableListOf()
 ) {
-    fun toConfiguration(): SkipPluginConfiguration = SkipPluginConfiguration(this)
+    fun toConfiguration(): SkipConfiguration = SkipConfiguration(this)
 }
 
-class SkipPluginConfiguration(skipYaml: SkipYaml) : PluginConfiguration {
+class SkipConfiguration(skipYaml: SkipYaml) : PluginConfiguration {
 
     private val ignoreTables = skipYaml.ignoreTables.toList()
     private val ignorePrefixes = skipYaml.ignorePrefixes.toList()

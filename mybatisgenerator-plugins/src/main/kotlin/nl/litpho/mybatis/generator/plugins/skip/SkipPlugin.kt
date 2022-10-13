@@ -12,7 +12,7 @@ import org.mybatis.generator.api.dom.kotlin.KotlinType
 
 open class SkipPlugin : PluginAdapter() {
 
-    private lateinit var configuration: SkipPluginConfiguration
+    private lateinit var configuration: SkipConfiguration
 
     override fun validate(warnings: MutableList<String>?): Boolean {
         val configurationLocation: String = properties.getProperty("configuration")

@@ -258,7 +258,7 @@ class DomainEnumGenerator(
             }
         }
 
-    // Deze SQL string concatenatie is veilig genoeg
+    // This SQL string concatenation is safe enough
     private fun getEnumValues(order: String): List<Map<String, String>> {
         val result: MutableList<Map<String, String>> = mutableListOf()
         val sql: String = "SELECT * FROM " + introspectedTable.fullyQualifiedTableNameAtRuntime
