@@ -6,36 +6,40 @@ import org.mybatis.generator.api.IntrospectedColumn
 import org.mybatis.generator.api.IntrospectedTable
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType
 
-data class NamingYaml(var prefix: String? = null, var tables: MutableList<TableData> = mutableListOf()) {
+data class NamingYaml(var default: Default? = null, var tables: MutableMap<String, Table> = mutableMapOf()) {
 
     fun toConfiguration(): NamingConfiguration = NamingConfiguration(this)
 
-    data class TableData(
-        var name: String? = null,
-        var type: String? = null,
+    data class Default(
         var prefix: String? = null,
-        var columns: MutableList<ColumnData> = mutableListOf()
+        var columns: MutableMap<String, Column> = mutableMapOf(),
+        var ignoredColumns: MutableList<String> = mutableListOf()
     )
 
-    data class ColumnData(
-        var name: String? = null,
+    data class Table(
+        var type: String? = null,
+        var prefix: String? = null,
+        var columns: MutableMap<String, Column> = mutableMapOf(),
+        var ignoredColumns: MutableList<String> = mutableListOf()
+    )
+
+    data class Column(
         var type: String? = null,
         var property: String? = null,
-        var defaultValue: String? = null,
-        var ignore: Boolean = false
+        var defaultValue: String? = null
     )
 }
 
 data class NamingConfiguration(private val namingYaml: NamingYaml) : PluginConfiguration {
 
     val namingConfigurationEntryMap: Map<String, NamingConfigurationEntry> =
-        namingYaml.tables.associate {
-            it.name!! to NamingConfigurationEntry(
-                it.type,
-                it.prefix ?: namingYaml.prefix ?: "",
-                it.columns
+        namingYaml.tables.map {
+            it.key to NamingConfigurationEntry(
+                it.value.type,
+                it.value.prefix ?: namingYaml.default?.prefix ?: "",
+                it.value.columns
             )
-        }
+        }.toMap()
 
     fun getTableConfiguration(table: String?): NamingConfigurationEntry? = namingConfigurationEntryMap[table]
 
@@ -46,14 +50,14 @@ data class NamingConfiguration(private val namingYaml: NamingYaml) : PluginConfi
 class NamingConfigurationEntry(
     val type: String?,
     val prefix: String,
-    columns: MutableList<NamingYaml.ColumnData>
+    columns: MutableMap<String, NamingYaml.Column>
 ) {
     val columnOverrides: Map<String, ColumnBasedJavaPropertyOverride> =
-        columns.associate { it.name!! to ColumnBasedJavaPropertyOverride(it.property, it.type) }
+        columns.mapValues { ColumnBasedJavaPropertyOverride(it.value.property, it.value.type) }
     val columnDefaultValues: Map<String, String> =
-        columns.filter { it.defaultValue != null }.associate { it.name!! to it.defaultValue!! }
-    val ignoredColumns: List<String> =
-        columns.filter { !it.ignore }.map { it.name!! }.toList()
+        columns.filter { it.value.defaultValue != null }.mapValues { it.value.defaultValue!! }
+//    val ignoredColumns: List<String> =
+//        columns.filter { !it.ignore }.map { it.name!! }.toList()
 }
 
 class ColumnBasedJavaPropertyOverride(private val property: String?, private val type: String?) {
