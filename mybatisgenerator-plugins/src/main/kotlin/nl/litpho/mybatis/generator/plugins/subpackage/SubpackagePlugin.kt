@@ -23,30 +23,25 @@ class SubpackagePlugin : PluginAdapter() {
     override fun initialized(introspectedTable: IntrospectedTable) {
         val suffix: String = configuration.getSubpackage(introspectedTable.aliasedFullyQualifiedTableNameAtRuntime)
         if (suffix.isNotEmpty()) {
-            val javaModelSubpackages = areSubpackagesEnabled(context.javaModelGeneratorConfiguration?.properties)
-            val sqlMapperSubpackages = areSubpackagesEnabled(context.sqlMapGeneratorConfiguration?.properties)
-            if (javaModelSubpackages) {
-                with(introspectedTable) {
-                    val baseRecordType = insertSuffix(suffix, baseRecordType)
-                    primaryKeyType = insertSuffix(suffix, primaryKeyType)
-                    this.baseRecordType = baseRecordType
-                    kotlinRecordType = baseRecordType
-                    exampleType = insertSuffix(suffix, exampleType)
-                    myBatisDynamicSqlSupportType = insertSuffix(suffix, myBatisDynamicSqlSupportType)
-                }
+            with(introspectedTable) {
+                val baseRecordType = insertSuffix(suffix, baseRecordType)
+                primaryKeyType = insertSuffix(suffix, primaryKeyType)
+                this.baseRecordType = baseRecordType
+                kotlinRecordType = baseRecordType
+                exampleType = insertSuffix(suffix, exampleType)
+                myBatisDynamicSqlSupportType = insertSuffix(suffix, myBatisDynamicSqlSupportType)
             }
-            if (sqlMapperSubpackages) {
-                with(introspectedTable) {
-                    myBatis3JavaMapperType = insertSuffix(suffix, myBatis3JavaMapperType)
-                    myBatis3XmlMapperPackage = appendSuffix(suffix, myBatis3XmlMapperPackage)
-                }
+            with(introspectedTable) {
+                myBatis3JavaMapperType = insertSuffix(suffix, myBatis3JavaMapperType)
+                myBatis3XmlMapperPackage = appendSuffix(suffix, myBatis3XmlMapperPackage)
             }
         }
 
         super.initialized(introspectedTable)
     }
 
-    private fun areSubpackagesEnabled(properties: Properties?): Boolean = properties?.getProperty("enableSubPackages").toBoolean()
+    private fun areSubpackagesEnabled(properties: Properties?): Boolean =
+        properties?.getProperty("enableSubPackages").toBoolean()
 
     companion object {
 
@@ -56,7 +51,10 @@ class SubpackagePlugin : PluginAdapter() {
             }
 
             val lastDot = fullyQualifiedType.lastIndexOf('.')
-            return appendSuffix(suffix, fullyQualifiedType.substring(0, lastDot)) + fullyQualifiedType.substring(lastDot)
+            return appendSuffix(
+                suffix,
+                fullyQualifiedType.substring(0, lastDot)
+            ) + fullyQualifiedType.substring(lastDot)
         }
 
         fun appendSuffix(suffix: String, pakkage: String): String = "$pakkage.$suffix"
