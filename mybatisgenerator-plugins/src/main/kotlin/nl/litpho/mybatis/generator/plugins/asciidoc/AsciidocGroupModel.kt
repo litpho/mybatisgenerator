@@ -20,7 +20,8 @@ data class AsciidocGroupModel(
     val subpackageConfiguration: SubpackageConfiguration?
 ) {
 
-    val tablesToDocument: SortedSet<IntrospectedTable> = TreeSet(Comparator.comparing { it.aliasedFullyQualifiedTableNameAtRuntime })
+    val tablesToDocument: SortedSet<IntrospectedTable> =
+        TreeSet(Comparator.comparing { it.aliasedFullyQualifiedTableNameAtRuntime })
 
     val importedKeys: MutableMap<IntrospectedTable, SortedSet<String>> = mutableMapOf()
 
@@ -31,7 +32,9 @@ data class AsciidocGroupModel(
     private val enumsUsedFromPackage: MutableMap<String, MutableSet<String>> = HashMap()
 
     fun calculateTablesToDocument() {
-        group.includePackages.add(requireNotNull(group.rootPackage))
+        if (!group.rootPackage.isNullOrEmpty()) {
+            group.includePackages.add(group.rootPackage)
+        }
         tablesToDocument.addAll(filterAllTables())
 
         if (skipConfiguration != null) {
@@ -58,8 +61,10 @@ data class AsciidocGroupModel(
         } else {
             allTables.values
                 .filter { introspectedTable ->
-                    val subpackage = subpackageConfiguration.getSubpackage(introspectedTable.aliasedFullyQualifiedTableNameAtRuntime)
-                    group.includePackages.contains(subpackage) ||
+                    val subpackage =
+                        subpackageConfiguration.getSubpackage(introspectedTable.aliasedFullyQualifiedTableNameAtRuntime)
+                    (group.includeRecursive && group.rootPackage == null) ||
+                        group.includePackages.contains(subpackage) ||
                         (group.includeRecursive && subpackage.startsWith("${group.rootPackage}.")) ||
                         group.includeTables.contains(introspectedTable.aliasedFullyQualifiedTableNameAtRuntime)
                 }
@@ -84,7 +89,8 @@ data class AsciidocGroupModel(
         introspectedTable: IntrospectedTable,
         subPackagePluginConfiguration: SubpackageConfiguration?
     ) {
-        val importedKeysResultSet = conn.metaData.getImportedKeys(conn.catalog, conn.schema, introspectedTable.fullyQualifiedTableNameAtRuntime)
+        val importedKeysResultSet =
+            conn.metaData.getImportedKeys(conn.catalog, conn.schema, introspectedTable.fullyQualifiedTableNameAtRuntime)
         while (importedKeysResultSet.next()) {
             val pktableName = importedKeysResultSet.getString("PKTABLE_NAME")
             importedKeys.computeIfAbsent(introspectedTable) { TreeSet() }.add(pktableName)
@@ -100,7 +106,8 @@ data class AsciidocGroupModel(
     }
 
     private fun parseExportedKeys(conn: Connection, introspectedTable: IntrospectedTable) {
-        val exportedKeysResultSet = conn.metaData.getExportedKeys(conn.catalog, conn.schema, introspectedTable.fullyQualifiedTableNameAtRuntime)
+        val exportedKeysResultSet =
+            conn.metaData.getExportedKeys(conn.catalog, conn.schema, introspectedTable.fullyQualifiedTableNameAtRuntime)
         while (exportedKeysResultSet.next()) {
             val pktableName = exportedKeysResultSet.getString("PKTABLE_NAME")
             exportedKeys.computeIfAbsent(introspectedTable) { TreeSet() }.add(pktableName)

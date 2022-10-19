@@ -149,7 +149,8 @@ class PlantUMLDiagram(
             for (tableName in relationsForTable) {
                 val introspectedForeignTable = allTables.getValue(tableName)
                 val keyPackage = getPackage(introspectedForeignTable.aliasedFullyQualifiedTableNameAtRuntime)
-                if (shouldIncludeForeignTable(tableName, keyPackage, fullRootPackage)) {
+                val subpackage = getSubpackage(introspectedForeignTable.aliasedFullyQualifiedTableNameAtRuntime)
+                if (shouldIncludeForeignTable(tableName, keyPackage, subpackage, fullRootPackage)) {
                     includedMap.computeIfAbsent(keyPackage) { HashSet() }.add(introspectedForeignTable)
                 } else {
                     if (includedEnums.contains(tableName)) {
@@ -164,8 +165,10 @@ class PlantUMLDiagram(
         return includedMap.toMap() to excludedMap.toMap()
     }
 
-    private fun shouldIncludeForeignTable(tableName: String, keyPackage: String, fullRootPackage: String) =
-        group.includeTables.contains(tableName) || group.includePackages.contains(keyPackage) || keyPackage.startsWith(fullRootPackage)
+    private fun shouldIncludeForeignTable(tableName: String, fullPackage: String, keyPackage: String, fullRootPackage: String) =
+        group.includeTables.contains(tableName) || group.includePackages.contains(keyPackage) || fullPackage.startsWith(
+            fullRootPackage
+        )
 
     private fun getPackage(table: String): String =
         if (subpackageConfiguration == null) {
@@ -178,4 +181,7 @@ class PlantUMLDiagram(
                 "$targetPackage.$subpackageFromConfiguration"
             }
         }
+
+    private fun getSubpackage(table: String): String =
+        subpackageConfiguration?.getSubpackage(table) ?: group.rootPackage!!
 }
