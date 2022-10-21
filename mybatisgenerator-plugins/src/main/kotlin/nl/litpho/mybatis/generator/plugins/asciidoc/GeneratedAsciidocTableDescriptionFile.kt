@@ -18,10 +18,10 @@ class GeneratedAsciidocTableDescriptionFile(
                 continue
             }
             sb.append("== ").append(table.fullyQualifiedTableNameAtRuntime).append("\n")
-            sb.append(table.remarks).append("\n")
+            table.remarks?.let { sb.append(table.remarks).append("\n") }
             sb.append("[%header, cols=5*]\n")
             sb.append("|===\n")
-            sb.append("|Naam|Type|Nullable|Primary Key|Omschrijving\n")
+            sb.append("|Name|Type|Nullable|Primary Key|Description\n")
             for (column in table.primaryKeyColumns) {
                 sb.append("|")
                     .append(column.actualColumnName)
@@ -29,8 +29,8 @@ class GeneratedAsciidocTableDescriptionFile(
                     .append(getJdbcTypeString(column))
                     .append("|")
                     .append(getNullableString(column))
-                    .append("|J|")
-                    .append(column.remarks)
+                    .append("|Y|")
+                    .append(column.remarks ?: "")
                     .append("\n")
             }
             for (column in table.nonPrimaryKeyColumns) {
@@ -41,7 +41,7 @@ class GeneratedAsciidocTableDescriptionFile(
                     .append("|")
                     .append(getNullableString(column))
                     .append("|N|")
-                    .append(column.remarks)
+                    .append(column.remarks ?: "")
                     .append("\n")
             }
             sb.append("|===\n")
@@ -50,7 +50,7 @@ class GeneratedAsciidocTableDescriptionFile(
         return sb.toString()
     }
 
-    private fun getNullableString(introspectedColumn: IntrospectedColumn): String = if (introspectedColumn.isNullable) "J" else "N"
+    private fun getNullableString(introspectedColumn: IntrospectedColumn): String = if (introspectedColumn.isNullable) "Y" else "N"
 
     private fun getJdbcTypeString(introspectedColumn: IntrospectedColumn): String =
         if (introspectedColumn.length == 65535 && introspectedColumn.scale == 32767) {

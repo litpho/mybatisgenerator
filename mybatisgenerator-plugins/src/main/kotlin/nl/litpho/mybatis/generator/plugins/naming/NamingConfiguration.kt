@@ -37,7 +37,8 @@ data class NamingConfiguration(private val namingYaml: NamingYaml) : PluginConfi
             it.key to NamingConfigurationEntry(
                 it.value.type,
                 it.value.prefix ?: namingYaml.default?.prefix ?: "",
-                it.value.columns
+                it.value.columns,
+                namingYaml.default?.columns
             )
         }.toMap()
 
@@ -50,7 +51,8 @@ data class NamingConfiguration(private val namingYaml: NamingYaml) : PluginConfi
 class NamingConfigurationEntry(
     val type: String?,
     val prefix: String,
-    columns: MutableMap<String, NamingYaml.Column>
+    columns: MutableMap<String, NamingYaml.Column>,
+    defaultColumns: MutableMap<String, NamingYaml.Column>?
 ) {
     val columnOverrides: Map<String, ColumnBasedJavaPropertyOverride> =
         columns.mapValues { ColumnBasedJavaPropertyOverride(it.value.property, it.value.type) }

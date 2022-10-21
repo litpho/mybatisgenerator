@@ -36,10 +36,10 @@ class GeneratedTableUsageFile(
             if (!skipTablePluginConfiguration.isIgnored(allTables.getValue(includedTable))) {
                 val implicitSubpackage = subPackagePluginConfiguration.getSubpackage(includedTable)
                 if (includePackages.contains(implicitSubpackage)) {
-                    list.add("$includedTable wordt al impliciet geinclude als package $implicitSubpackage")
+                    list.add("$includedTable is already included implicity as part of package $implicitSubpackage")
                 }
                 if (rootPackage != null && includeRecursive && implicitSubpackage.startsWith("$rootPackage.")) {
-                    list.add("$includedTable wordt al impliciet recursief geinclude als package $implicitSubpackage")
+                    list.add("$includedTable is already included implicity by recursion as package $implicitSubpackage")
                 }
             }
         }
@@ -55,12 +55,12 @@ class GeneratedTableUsageFile(
         val list: MutableList<String> = mutableListOf()
         for (excludedTable in excludeTables) {
             if (includeTables.contains(excludedTable)) {
-                list.add("$excludedTable wordt zowel expliciet geinclude als geexclude")
+                list.add("$excludedTable is excluded both explictly as implicitly")
             } else {
                 if (subPackagePluginConfiguration != null) {
                     val implicitSubpackage = subPackagePluginConfiguration.getSubpackage(excludedTable)
                     if (!includePackages.contains(implicitSubpackage)) {
-                        list.add("$excludedTable wordt overbodig geexclude")
+                        list.add("$excludedTable does not need to be excluded")
                     }
                 }
             }

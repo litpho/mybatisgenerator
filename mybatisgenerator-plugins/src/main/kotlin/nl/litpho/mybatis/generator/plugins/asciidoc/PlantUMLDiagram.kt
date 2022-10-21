@@ -101,7 +101,7 @@ class PlantUMLDiagram(
         excludedMap.keys
             .sorted()
             .forEach { excludedPackage ->
-                list.add("package \"extern: $excludedPackage\" <<Rectangle>> #lightgrey {")
+                list.add("package \"external: $excludedPackage\" <<Rectangle>> #lightgrey {")
                 for (introspectedTable: IntrospectedTable in excludedMap.getValue(excludedPackage)) {
                     list.add("\tclass ${introspectedTable.aliasedFullyQualifiedTableNameAtRuntime}")
                 }
