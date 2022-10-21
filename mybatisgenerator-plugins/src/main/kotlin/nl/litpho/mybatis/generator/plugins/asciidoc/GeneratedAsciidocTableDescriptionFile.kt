@@ -50,27 +50,28 @@ class GeneratedAsciidocTableDescriptionFile(
         return sb.toString()
     }
 
-    private fun getNullableString(introspectedColumn: IntrospectedColumn): String = if (introspectedColumn.isNullable) "Y" else "N"
+    private fun getNullableString(introspectedColumn: IntrospectedColumn): String =
+        if (introspectedColumn.isNullable) "Y" else "N"
+}
 
-    private fun getJdbcTypeString(introspectedColumn: IntrospectedColumn): String =
-        if (introspectedColumn.length == 65535 && introspectedColumn.scale == 32767) {
-            "NUMBER"
+fun getJdbcTypeString(introspectedColumn: IntrospectedColumn): String =
+    if (introspectedColumn.length == 65535 && introspectedColumn.scale == 32767) {
+        "NUMBER"
+    } else {
+        if (introspectedColumn.jdbcType == Types.BINARY && introspectedColumn.length == 16) {
+            "UUID"
         } else {
-            if (introspectedColumn.jdbcType == Types.BINARY && introspectedColumn.length == 16) {
-                "UUID"
-            } else {
-                when (introspectedColumn.jdbcType) {
-                    Types.CHAR -> "CHAR(${introspectedColumn.length})"
-                    Types.VARCHAR -> "VARCHAR(${introspectedColumn.length})"
-                    Types.FLOAT, Types.REAL -> "FLOAT"
-                    Types.DECIMAL, Types.INTEGER, Types.NUMERIC, Types.VARBINARY -> "NUMBER(${introspectedColumn.length},${introspectedColumn.scale})"
-                    Types.DATE -> "DATE"
-                    Types.TIME -> "TIME"
-                    Types.TIMESTAMP -> "TIMESTAMP"
-                    Types.BLOB -> "BLOB"
-                    Types.BOOLEAN -> "BOOLEAN"
-                    else -> "${introspectedColumn.jdbcTypeName}(${introspectedColumn.length},${introspectedColumn.scale})"
-                }
+            when (introspectedColumn.jdbcType) {
+                Types.CHAR -> "CHAR(${introspectedColumn.length})"
+                Types.VARCHAR -> "VARCHAR(${introspectedColumn.length})"
+                Types.FLOAT, Types.REAL -> "FLOAT"
+                Types.DECIMAL, Types.INTEGER, Types.NUMERIC, Types.VARBINARY -> "NUMBER(${introspectedColumn.length},${introspectedColumn.scale})"
+                Types.DATE -> "DATE"
+                Types.TIME -> "TIME"
+                Types.TIMESTAMP -> "TIMESTAMP"
+                Types.BLOB -> "BLOB"
+                Types.BOOLEAN -> "BOOLEAN"
+                else -> "${introspectedColumn.jdbcTypeName}(${introspectedColumn.length},${introspectedColumn.scale})"
             }
         }
-}
+    }

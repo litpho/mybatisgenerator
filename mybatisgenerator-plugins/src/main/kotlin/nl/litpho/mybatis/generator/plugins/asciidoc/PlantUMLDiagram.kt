@@ -106,7 +106,7 @@ class PlantUMLDiagram(
     ): String {
         val newMaxLength = ((maxLength / 8) + 1) * 8
         val numTabs: Int = ceil((newMaxLength - introspectedColumn.actualColumnName.length) / 8.0).toInt()
-        return "\t$prefix\\t${introspectedColumn.actualColumnName}${"\\t".repeat(numTabs)}${introspectedColumn.jdbcTypeName}"
+        return "\t{field}$prefix\\t${introspectedColumn.actualColumnName}${"\\t".repeat(numTabs)}${getJdbcTypeString(introspectedColumn)}"
     }
 
     private fun getExcludedClasses(excludedMap: Map<String, MutableSet<IntrospectedTable>>): List<String> {
