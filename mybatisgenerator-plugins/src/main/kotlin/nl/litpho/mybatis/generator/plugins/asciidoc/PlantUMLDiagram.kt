@@ -3,8 +3,10 @@ package nl.litpho.mybatis.generator.plugins.asciidoc
 import nl.litpho.mybatis.generator.plugins.asciidoc.AsciidocConfiguration.GroupDefinition
 import nl.litpho.mybatis.generator.plugins.domainenum.DomainEnumConfiguration
 import nl.litpho.mybatis.generator.plugins.subpackage.SubpackageConfiguration
+import org.mybatis.generator.api.IntrospectedColumn
 import org.mybatis.generator.api.IntrospectedTable
 import java.util.SortedSet
+import kotlin.math.ceil
 
 private const val NO_PACKAGE = "<no-package>"
 
@@ -27,6 +29,7 @@ class PlantUMLDiagram(
         list.add(".$name")
         list.add("[plantuml, ${group.filename}, svg]")
         list.add("----")
+        list.add("skinparam classAttributeFontName Courier")
         list.add("skinparam linetype ortho")
         list.add("package \"${group.name}\" <<Rectangle>> {")
         list.addAll(getIncludedClasses(includedMap))
@@ -80,21 +83,31 @@ class PlantUMLDiagram(
     private fun getNonEnumClass(introspectedTable: IntrospectedTable): List<String> {
         val list: MutableList<String> = mutableListOf()
         list.add("class ${introspectedTable.fullyQualifiedTableNameAtRuntime} << (T,MediumTurquoise) >> {")
-        if (introspectedTable.primaryKeyColumns.isNotEmpty() && introspectedTable.nonPrimaryKeyColumns.isNotEmpty()) {
-            list.add("\t..")
-            list.addAll(getPrimaryKeyColumns(introspectedTable))
-            list.add("\t..")
-        } else {
-            list.addAll(getPrimaryKeyColumns(introspectedTable))
+        if (introspectedTable.allColumns.isNotEmpty()) {
+            val maxLength = introspectedTable.allColumns.maxOf { it.actualColumnName.length }
+            list.addAll(getPrimaryKeyColumns(introspectedTable, maxLength))
+            list.addAll(getNonPrimaryKeyColumns(introspectedTable, maxLength))
         }
-        list.addAll(introspectedTable.nonPrimaryKeyColumns.map { "\t${it.actualColumnName}" })
         list.add("}")
 
         return list
     }
 
-    private fun getPrimaryKeyColumns(introspectedTable: IntrospectedTable): List<String> =
-        introspectedTable.primaryKeyColumns.map { "\t${it.actualColumnName}" }
+    private fun getPrimaryKeyColumns(introspectedTable: IntrospectedTable, maxLength: Int): List<String> =
+        introspectedTable.primaryKeyColumns.map { columnRepresentation(it, maxLength, "PK") }
+
+    private fun getNonPrimaryKeyColumns(introspectedTable: IntrospectedTable, maxLength: Int): List<String> =
+        introspectedTable.nonPrimaryKeyColumns.map { columnRepresentation(it, maxLength, "") }
+
+    private fun columnRepresentation(
+        introspectedColumn: IntrospectedColumn,
+        maxLength: Int,
+        prefix: String
+    ): String {
+        val newMaxLength = ((maxLength / 8) + 1) * 8
+        val numTabs: Int = ceil((newMaxLength - introspectedColumn.actualColumnName.length) / 8.0).toInt()
+        return "\t$prefix\\t${introspectedColumn.actualColumnName}${"\\t".repeat(numTabs)}${introspectedColumn.jdbcTypeName}"
+    }
 
     private fun getExcludedClasses(excludedMap: Map<String, MutableSet<IntrospectedTable>>): List<String> {
         val list: MutableList<String> = mutableListOf()
