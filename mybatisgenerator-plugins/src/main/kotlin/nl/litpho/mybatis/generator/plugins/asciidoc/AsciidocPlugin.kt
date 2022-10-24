@@ -149,15 +149,11 @@ class AsciidocPlugin : PluginAdapter() {
         }
         File(outputDir).mkdirs()
         val diagram = PlantUMLDiagram(
-            groupModel.group.name,
+            groupModel,
             context.javaModelGeneratorConfiguration.targetPackage,
-            groupModel.tablesToDocument,
-            groupModel.includedEnums,
             allTables,
-            groupModel.importedKeys,
             domeinEnumPluginConfiguration,
-            subPackagePluginConfiguration,
-            groupModel.group
+            subPackagePluginConfiguration
         )
         return GeneratedAsciidocDiagramFile(groupModel.group, outputDir, diagram)
     }

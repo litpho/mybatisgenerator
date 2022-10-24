@@ -18,7 +18,8 @@ class GeneratedAsciidocTableDescriptionFile(
                 continue
             }
             sb.append("== ").append(table.fullyQualifiedTableNameAtRuntime).append("\n")
-            table.remarks?.let { sb.append(table.remarks).append("\n") }
+            table.remarks?.let { sb.append(table.remarks).append("\n\n") }
+            sb.append("=== Columns\n")
             sb.append("[%header, cols=5*]\n")
             sb.append("|===\n")
             sb.append("|Name|Type|Nullable|Primary Key|Description\n")
@@ -43,6 +44,24 @@ class GeneratedAsciidocTableDescriptionFile(
                     .append("|N|")
                     .append(column.remarks ?: "")
                     .append("\n")
+            }
+            sb.append("|===\n")
+            sb.append("\n")
+
+            sb.append("=== Keys\n")
+            sb.append("[%header]\n")
+            sb.append("|===\n")
+            sb.append("|Label|Name|Type|Columns|Comments\n")
+            val keyInfo = groupModel.keyInfoMap.getOrDefault(table, emptyMap())
+            keyInfo.entries.filter { e -> e.key.type == "PRIMARY KEY" }
+            for ((info, columns) in keyInfo.entries.filter { e -> e.key.type == "PRIMARY KEY" }.sortedBy { it.key.name }) {
+                sb.append("|${info.label}|${info.name}|${info.type}|${columns.joinToString(",")}|${info.remarks}\n")
+            }
+            for ((info, columns) in keyInfo.entries.filter { e -> e.key.type == "FOREIGN KEY" }.sortedBy { it.key.name }) {
+                sb.append("|${info.label}|${info.name}|${info.type}|${columns.joinToString(",")}|${info.remarks}\n")
+            }
+            for ((info, columns) in keyInfo.entries.filter { e -> e.key.type == "UNIQUE" }.sortedBy { it.key.name }) {
+                sb.append("|${info.label}|${info.name}|${info.type}|${columns.joinToString(",")}|${info.remarks}\n")
             }
             sb.append("|===\n")
             sb.append("\n")

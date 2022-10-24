@@ -1,32 +1,27 @@
 package nl.litpho.mybatis.generator.plugins.asciidoc
 
-import nl.litpho.mybatis.generator.plugins.asciidoc.AsciidocConfiguration.GroupDefinition
 import nl.litpho.mybatis.generator.plugins.domainenum.DomainEnumConfiguration
 import nl.litpho.mybatis.generator.plugins.subpackage.SubpackageConfiguration
 import org.mybatis.generator.api.IntrospectedColumn
 import org.mybatis.generator.api.IntrospectedTable
-import java.util.SortedSet
 import kotlin.math.ceil
 
 private const val NO_PACKAGE = "<no-package>"
 
 class PlantUMLDiagram(
-    private val name: String,
+    private val groupModel: AsciidocGroupModel,
     private val targetPackage: String,
-    private val tablesToDocument: Collection<IntrospectedTable>,
-    private val includedEnums: Set<String>,
     private val allTables: Map<String, IntrospectedTable>,
-    private val keys: Map<IntrospectedTable, SortedSet<String>>,
     private val domainEnumConfiguration: DomainEnumConfiguration?,
-    private val subpackageConfiguration: SubpackageConfiguration?,
-    private val group: GroupDefinition
+    private val subpackageConfiguration: SubpackageConfiguration?
 ) : AsciidocContents {
 
     override fun getFormattedContent(): String {
+        val group = groupModel.group
         println("Generating diagram \"" + group.name + "\"")
-        val (includedMap, excludedMap) = bepaalIncludesEnExcludes()
+        val (includedMap, excludedMap) = determineIncludesAndExcludes()
         val list: MutableList<String> = mutableListOf()
-        list.add(".$name")
+        list.add(".${group.name}")
         list.add("[plantuml, ${group.filename}, svg]")
         list.add("----")
         list.add("skinparam classAttributeFontName Courier")
@@ -84,29 +79,48 @@ class PlantUMLDiagram(
         val list: MutableList<String> = mutableListOf()
         list.add("class ${introspectedTable.fullyQualifiedTableNameAtRuntime} << (T,MediumTurquoise) >> {")
         if (introspectedTable.allColumns.isNotEmpty()) {
-            val maxLength = introspectedTable.allColumns.maxOf { it.actualColumnName.length }
-            list.addAll(getPrimaryKeyColumns(introspectedTable, maxLength))
-            list.addAll(getNonPrimaryKeyColumns(introspectedTable, maxLength))
+            val prefixes = calculatePrefixes(introspectedTable, introspectedTable.allColumns)
+            val maxPrefixLength = prefixes.maxOf { it.length }
+            val maxColumnLength = introspectedTable.allColumns.maxOf { it.actualColumnName.length }
+            introspectedTable.allColumns.forEachIndexed { i, column ->
+                list.add(renderColumn(prefixes[i], column, maxPrefixLength, maxColumnLength))
+            }
         }
         list.add("}")
 
         return list
     }
 
-    private fun getPrimaryKeyColumns(introspectedTable: IntrospectedTable, maxLength: Int): List<String> =
-        introspectedTable.primaryKeyColumns.map { columnRepresentation(it, maxLength, "PK") }
-
-    private fun getNonPrimaryKeyColumns(introspectedTable: IntrospectedTable, maxLength: Int): List<String> =
-        introspectedTable.nonPrimaryKeyColumns.map { columnRepresentation(it, maxLength, "") }
-
-    private fun columnRepresentation(
+    private fun renderColumn(
+        prefix: String,
         introspectedColumn: IntrospectedColumn,
-        maxLength: Int,
-        prefix: String
+        maxPrefixLength: Int,
+        maxColumnLength: Int
     ): String {
+        val numPrefixTabs: Int = calculateNumTabs(maxPrefixLength, prefix)
+        val numColumnTabs: Int = calculateNumTabs(maxColumnLength, introspectedColumn.actualColumnName)
+        val nullableString: String = if (introspectedColumn.isNullable) "" else "* "
+        val prefixString = "$prefix${"\\t".repeat(numPrefixTabs)}"
+        val columnName = introspectedColumn.actualColumnName
+        val columnTabs = "\\t".repeat(numColumnTabs)
+        return "\t{field}$nullableString$prefixString$columnName$columnTabs${getJdbcTypeString(introspectedColumn)}"
+    }
+
+    private fun calculateNumTabs(maxLength: Int, value: String): Int {
         val newMaxLength = ((maxLength / 8) + 1) * 8
-        val numTabs: Int = ceil((newMaxLength - introspectedColumn.actualColumnName.length) / 8.0).toInt()
-        return "\t{field}$prefix\\t${introspectedColumn.actualColumnName}${"\\t".repeat(numTabs)}${getJdbcTypeString(introspectedColumn)}"
+        return ceil((newMaxLength - value.length) / 8.0).toInt()
+    }
+
+    private fun calculatePrefixes(introspectedTable: IntrospectedTable, columns: List<IntrospectedColumn>): List<String> =
+        columns.map { column -> calculatePrefix(introspectedTable, column) }
+
+    private fun calculatePrefix(introspectedTable: IntrospectedTable, column: IntrospectedColumn): String {
+        val list: MutableList<String> = mutableListOf()
+        groupModel.keyInfoMap[introspectedTable]?.filter { it.value.contains(column.actualColumnName) }?.keys?.map { it.label }?.filter { it?.startsWith("PK") ?: false }?.sortedBy { it }?.forEach { list.add(it!!) }
+        groupModel.keyInfoMap[introspectedTable]?.filter { it.value.contains(column.actualColumnName) }?.keys?.map { it.label }?.filter { it?.startsWith("UK") ?: false }?.sortedBy { it }?.forEach { list.add(it!!) }
+        groupModel.keyInfoMap[introspectedTable]?.filter { it.value.contains(column.actualColumnName) }?.keys?.map { it.label }?.filter { it?.startsWith("FK") ?: false }?.sortedBy { it }?.forEach { list.add(it!!) }
+
+        return list.joinToString(",")
     }
 
     private fun getExcludedClasses(excludedMap: Map<String, MutableSet<IntrospectedTable>>): List<String> {
@@ -126,13 +140,11 @@ class PlantUMLDiagram(
 
     private fun getConnections(): List<String> {
         val list: MutableList<String> = mutableListOf()
-        for (introspectedTable: IntrospectedTable in tablesToDocument) {
-            if (keys.containsKey(introspectedTable)) {
-                for (tableName: String in keys.getValue(introspectedTable)) {
-                    val pkIntrospectedTable: IntrospectedTable? = allTables[tableName]
-                    if (pkIntrospectedTable != null) {
-                        list.add("${pkIntrospectedTable.aliasedFullyQualifiedTableNameAtRuntime} *-- ${introspectedTable.aliasedFullyQualifiedTableNameAtRuntime}")
-                    }
+        for (introspectedTable: IntrospectedTable in groupModel.tablesToDocument) {
+            for (tableName: String in groupModel.importedKeys.getOrDefault(introspectedTable, emptySet())) {
+                val pkIntrospectedTable: IntrospectedTable? = allTables[tableName]
+                if (pkIntrospectedTable != null) {
+                    list.add("${pkIntrospectedTable.aliasedFullyQualifiedTableNameAtRuntime} *-- ${introspectedTable.aliasedFullyQualifiedTableNameAtRuntime}")
                 }
             }
         }
@@ -141,20 +153,20 @@ class PlantUMLDiagram(
     }
 
     private fun bepaalRootPackage(): String =
-        if (group.rootPackage.isNullOrEmpty()) {
+        if (groupModel.group.rootPackage.isNullOrEmpty()) {
             targetPackage
         } else {
-            "$targetPackage.${group.rootPackage}"
+            "$targetPackage.${groupModel.group.rootPackage}"
         }
 
-    private fun bepaalIncludesEnExcludes(): Pair<Map<String, MutableSet<IntrospectedTable>>, Map<String, MutableSet<IntrospectedTable>>> {
+    private fun determineIncludesAndExcludes(): Pair<Map<String, MutableSet<IntrospectedTable>>, Map<String, MutableSet<IntrospectedTable>>> {
         val fullRootPackage = bepaalRootPackage()
         val includedMap: MutableMap<String, MutableSet<IntrospectedTable>> = HashMap()
         val excludedMap: MutableMap<String, MutableSet<IntrospectedTable>> = HashMap()
-        for (introspectedTable: IntrospectedTable in tablesToDocument) {
+        for (introspectedTable: IntrospectedTable in groupModel.tablesToDocument) {
             val pakkage = getPackage(introspectedTable.aliasedFullyQualifiedTableNameAtRuntime)
             includedMap.computeIfAbsent(pakkage) { HashSet() }.add(introspectedTable)
-            val relationsForTable = keys[introspectedTable]
+            val relationsForTable = groupModel.importedKeys[introspectedTable]
             if (subpackageConfiguration == null || relationsForTable == null) {
                 continue
             }
@@ -166,7 +178,7 @@ class PlantUMLDiagram(
                 if (shouldIncludeForeignTable(tableName, keyPackage, subpackage, fullRootPackage)) {
                     includedMap.computeIfAbsent(keyPackage) { HashSet() }.add(introspectedForeignTable)
                 } else {
-                    if (includedEnums.contains(tableName)) {
+                    if (groupModel.includedEnums.contains(tableName)) {
                         includedMap.computeIfAbsent(NO_PACKAGE) { HashSet() }.add(introspectedForeignTable)
                     } else {
                         excludedMap.computeIfAbsent(keyPackage) { HashSet() }.add(introspectedForeignTable)
@@ -178,14 +190,19 @@ class PlantUMLDiagram(
         return includedMap.toMap() to excludedMap.toMap()
     }
 
-    private fun shouldIncludeForeignTable(tableName: String, fullPackage: String, keyPackage: String, fullRootPackage: String) =
-        group.includeTables.contains(tableName) || group.includePackages.contains(keyPackage) || fullPackage.startsWith(
-            fullRootPackage
-        )
+    private fun shouldIncludeForeignTable(
+        tableName: String,
+        fullPackage: String,
+        keyPackage: String,
+        fullRootPackage: String
+    ) =
+        groupModel.group.includeTables.contains(tableName) ||
+            groupModel.group.includePackages.contains(keyPackage) ||
+            fullPackage.startsWith(fullRootPackage)
 
     private fun getPackage(table: String): String =
         if (subpackageConfiguration == null) {
-            group.rootPackage!!
+            groupModel.group.rootPackage!!
         } else {
             val subpackageFromConfiguration: String = subpackageConfiguration.getSubpackage(table)
             if (subpackageFromConfiguration.isEmpty()) {
@@ -196,5 +213,5 @@ class PlantUMLDiagram(
         }
 
     private fun getSubpackage(table: String): String =
-        subpackageConfiguration?.getSubpackage(table) ?: group.rootPackage!!
+        subpackageConfiguration?.getSubpackage(table) ?: groupModel.group.rootPackage!!
 }

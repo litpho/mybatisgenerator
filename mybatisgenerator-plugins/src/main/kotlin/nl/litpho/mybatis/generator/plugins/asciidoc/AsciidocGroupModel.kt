@@ -25,9 +25,11 @@ data class AsciidocGroupModel(
 
     val importedKeys: MutableMap<IntrospectedTable, SortedSet<String>> = mutableMapOf()
 
-    private val exportedKeys: MutableMap<IntrospectedTable, SortedSet<String>> = mutableMapOf()
-
     val includedEnums: SortedSet<String> = TreeSet()
+
+    val keyInfoMap: MutableMap<IntrospectedTable, MutableMap<KeyInfo, SortedSet<String>>> = mutableMapOf()
+
+    private val exportedKeys: MutableMap<IntrospectedTable, SortedSet<String>> = mutableMapOf()
 
     private val enumsUsedFromPackage: MutableMap<String, MutableSet<String>> = HashMap()
 
@@ -77,6 +79,7 @@ data class AsciidocGroupModel(
                 for (introspectedTable in tablesToDocument) {
                     parseImportedKeys(conn, introspectedTable, subpackageConfiguration)
                     parseExportedKeys(conn, introspectedTable)
+                    parseKeyInfo(conn, introspectedTable)
                 }
             }
         } catch (e: SQLException) {
@@ -113,4 +116,47 @@ data class AsciidocGroupModel(
             exportedKeys.computeIfAbsent(introspectedTable) { TreeSet() }.add(pktableName)
         }
     }
+
+    private fun parseKeyInfo(conn: Connection, introspectedTable: IntrospectedTable) {
+        val ps = conn.prepareStatement(
+            """
+SELECT TCS.CONSTRAINT_TYPE, TCS.CONSTRAINT_NAME, CCE.COLUMN_NAME, TCS.REMARKS
+  FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS TCS
+  JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE CCE ON CCE.CONSTRAINT_NAME = TCS.CONSTRAINT_NAME
+ WHERE TCS.TABLE_NAME = ?
+   AND CCE.TABLE_NAME = ?
+            """.trimIndent()
+        )
+        ps.setString(1, introspectedTable.fullyQualifiedTableNameAtRuntime)
+        ps.setString(2, introspectedTable.fullyQualifiedTableNameAtRuntime)
+        val rs = ps.executeQuery()
+        while (rs.next()) {
+            val constraintType = rs.getString("CONSTRAINT_TYPE")
+            val constraintName = rs.getString("CONSTRAINT_NAME")
+            val columnName = rs.getString("COLUMN_NAME")
+            val remarks = rs.getString("REMARKS")
+
+            keyInfoMap
+                .computeIfAbsent(introspectedTable) { mutableMapOf() }
+                .computeIfAbsent(KeyInfo(constraintType, constraintName, remarks)) { sortedSetOf() }
+                .add(columnName)
+        }
+
+        val map = keyInfoMap[introspectedTable]
+        map?.keys?.filter { it.type == "PRIMARY KEY" }?.forEach { it.label = "PK" }
+        val foreignKeys: List<KeyInfo> = map?.keys?.filter { it.type == "FOREIGN KEY" } ?: emptyList()
+        if (foreignKeys.size == 1) {
+            foreignKeys[0].label = "FK"
+        } else {
+            foreignKeys.sortedBy { it.name }.forEachIndexed { i, info -> info.label = "FK${i + 1}" }
+        }
+        val uniqueKeys: List<KeyInfo> = map?.keys?.filter { it.type == "UNIQUE" } ?: emptyList()
+        if (uniqueKeys.size == 1) {
+            uniqueKeys[0].label = "UK"
+        } else {
+            uniqueKeys.sortedBy { it.name }.forEachIndexed { i, info -> info.label = "UK${i + 1}" }
+        }
+    }
+
+    data class KeyInfo(val type: String, val name: String, val remarks: String?, var label: String? = null)
 }
