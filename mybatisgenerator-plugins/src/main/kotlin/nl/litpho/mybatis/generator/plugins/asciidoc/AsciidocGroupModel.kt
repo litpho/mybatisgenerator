@@ -27,7 +27,7 @@ data class AsciidocGroupModel(
 
     val includedEnums: SortedSet<String> = TreeSet()
 
-    val keyInfoMap: MutableMap<IntrospectedTable, MutableMap<KeyInfo, SortedSet<String>>> = mutableMapOf()
+    val keyInfoMap: MutableMap<IntrospectedTable, MutableMap<KeyInfo, ColumnData>> = mutableMapOf()
 
     private val exportedKeys: MutableMap<IntrospectedTable, SortedSet<String>> = mutableMapOf()
 
@@ -120,26 +120,27 @@ data class AsciidocGroupModel(
     private fun parseKeyInfo(conn: Connection, introspectedTable: IntrospectedTable) {
         val ps = conn.prepareStatement(
             """
-SELECT TCS.CONSTRAINT_TYPE, TCS.CONSTRAINT_NAME, CCE.COLUMN_NAME, TCS.REMARKS
+SELECT TCS.CONSTRAINT_TYPE, TCS.CONSTRAINT_NAME, CCE.COLUMN_NAME, TCS.REMARKS, CCE2.TABLE_NAME AS REF_TABLE, CCE2.COLUMN_NAME AS REF_COLUMN
   FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS TCS
-  JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE CCE ON CCE.CONSTRAINT_NAME = TCS.CONSTRAINT_NAME
+  JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE CCE ON CCE.CONSTRAINT_NAME = TCS.CONSTRAINT_NAME AND TCS.TABLE_NAME = CCE.TABLE_NAME
+  LEFT JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE CCE2 ON CCE2.CONSTRAINT_NAME = TCS.CONSTRAINT_NAME AND TCS.TABLE_NAME != CCE2.TABLE_NAME
  WHERE TCS.TABLE_NAME = ?
-   AND CCE.TABLE_NAME = ?
             """.trimIndent()
         )
         ps.setString(1, introspectedTable.fullyQualifiedTableNameAtRuntime)
-        ps.setString(2, introspectedTable.fullyQualifiedTableNameAtRuntime)
         val rs = ps.executeQuery()
         while (rs.next()) {
             val constraintType = rs.getString("CONSTRAINT_TYPE")
             val constraintName = rs.getString("CONSTRAINT_NAME")
             val columnName = rs.getString("COLUMN_NAME")
+            val refTableName = rs.getString("REF_TABLE")
+            val refColumnName = rs.getString("REF_COLUMN")
             val remarks = rs.getString("REMARKS")
 
             keyInfoMap
                 .computeIfAbsent(introspectedTable) { mutableMapOf() }
-                .computeIfAbsent(KeyInfo(constraintType, constraintName, remarks)) { sortedSetOf() }
-                .add(columnName)
+                .computeIfAbsent(KeyInfo(constraintType, constraintName, remarks, refTableName)) { ColumnData() }
+                .add(columnName, refColumnName)
         }
 
         val map = keyInfoMap[introspectedTable]
@@ -158,5 +159,18 @@ SELECT TCS.CONSTRAINT_TYPE, TCS.CONSTRAINT_NAME, CCE.COLUMN_NAME, TCS.REMARKS
         }
     }
 
-    data class KeyInfo(val type: String, val name: String, val remarks: String?, var label: String? = null)
+    data class KeyInfo(
+        val type: String,
+        val name: String,
+        val remarks: String?,
+        val refTable: String?,
+        var label: String? = null
+    )
+
+    data class ColumnData(val columns: SortedSet<String> = sortedSetOf(), val refColumns: SortedSet<String> = sortedSetOf()) {
+        fun add(column: String, refColumn: String?) {
+            columns.add(column)
+            refColumn?.let { refColumns.add(it) }
+        }
+    }
 }

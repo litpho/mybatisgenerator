@@ -116,11 +116,24 @@ class PlantUMLDiagram(
 
     private fun calculatePrefix(introspectedTable: IntrospectedTable, column: IntrospectedColumn): String {
         val list: MutableList<String> = mutableListOf()
-        groupModel.keyInfoMap[introspectedTable]?.filter { it.value.contains(column.actualColumnName) }?.keys?.map { it.label }?.filter { it?.startsWith("PK") ?: false }?.sortedBy { it }?.forEach { list.add(it!!) }
-        groupModel.keyInfoMap[introspectedTable]?.filter { it.value.contains(column.actualColumnName) }?.keys?.map { it.label }?.filter { it?.startsWith("UK") ?: false }?.sortedBy { it }?.forEach { list.add(it!!) }
-        groupModel.keyInfoMap[introspectedTable]?.filter { it.value.contains(column.actualColumnName) }?.keys?.map { it.label }?.filter { it?.startsWith("FK") ?: false }?.sortedBy { it }?.forEach { list.add(it!!) }
+        list.addAll(getLabels(introspectedTable, column, "PK"))
+        list.addAll(getLabels(introspectedTable, column, "UK"))
+        list.addAll(getLabels(introspectedTable, column, "FK"))
+//        groupModel.keyInfoMap[introspectedTable]?.filter { it.value.contains(column.actualColumnName) }?.keys?.map { it.label }?.filter { it?.startsWith("PK") ?: false }?.sortedBy { it }?.forEach { list.add(it!!) }
+//        groupModel.keyInfoMap[introspectedTable]?.filter { it.value.contains(column.actualColumnName) }?.keys?.map { it.label }?.filter { it?.startsWith("UK") ?: false }?.sortedBy { it }?.forEach { list.add(it!!) }
+//        groupModel.keyInfoMap[introspectedTable]?.filter { it.value.contains(column.actualColumnName) }?.keys?.map { it.label }?.filter { it?.startsWith("FK") ?: false }?.sortedBy { it }?.forEach { list.add(it!!) }
 
         return list.joinToString(",")
+    }
+
+    private fun getLabels(introspectedTable: IntrospectedTable, introspectedColumn: IntrospectedColumn, prefix: String): List<String> {
+        return groupModel.keyInfoMap[introspectedTable]
+            ?.filter { it.value.columns.contains(introspectedColumn.actualColumnName) }
+            ?.keys
+            ?.map { it.label }
+            ?.filter { it?.startsWith(prefix) ?: false }
+            ?.map { it!! }
+            ?.sortedBy { it } ?: emptyList()
     }
 
     private fun getExcludedClasses(excludedMap: Map<String, MutableSet<IntrospectedTable>>): List<String> {
