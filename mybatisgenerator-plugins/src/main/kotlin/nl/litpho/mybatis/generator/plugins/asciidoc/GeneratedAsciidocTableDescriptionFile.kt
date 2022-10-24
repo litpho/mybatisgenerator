@@ -62,15 +62,24 @@ class GeneratedAsciidocTableDescriptionFile(
             }
             sb.append("|===\n")
             sb.append("\n")
-            sb.append("=== Foreign Keys\n")
-            sb.append("[%header]\n")
-            sb.append("|===\n")
-            sb.append("|Label|Name|Columns|Ref.Table|Ref.Columns|Comments\n")
-            for ((info, columnData) in keyInfo.entries.filter { e -> e.key.type == "FOREIGN KEY" }.sortedBy { it.key.name }) {
-                sb.append("|${info.label}|${info.name}|${columnData.columns.joinToString(",")}|${info.refTable}|${columnData.refColumns.joinToString(",")}|${info.remarks ?: ""}\n")
+            if (keyInfo.entries.any { e -> e.key.type == "FOREIGN KEY" }) {
+                sb.append("=== Foreign Keys\n")
+                sb.append("[%header]\n")
+                sb.append("|===\n")
+                sb.append("|Label|Name|Columns|Ref.Table|Ref.Columns|Comments\n")
+                for ((info, columnData) in keyInfo.entries.filter { e -> e.key.type == "FOREIGN KEY" }
+                    .sortedBy { it.key.name }) {
+                    sb.append(
+                        "|${info.label}|${info.name}|${columnData.columns.joinToString(",")}|${info.refTable}|${
+                        columnData.refColumns.joinToString(
+                            ","
+                        )
+                        }|${info.remarks ?: ""}\n"
+                    )
+                }
+                sb.append("|===\n")
+                sb.append("\n")
             }
-            sb.append("|===\n")
-            sb.append("\n")
         }
         return sb.toString()
     }
