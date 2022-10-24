@@ -167,7 +167,7 @@ SELECT TCS.CONSTRAINT_TYPE, TCS.CONSTRAINT_NAME, CCE.COLUMN_NAME, TCS.REMARKS, C
         var label: String? = null
     )
 
-    data class ColumnData(val columns: SortedSet<String> = sortedSetOf(), val refColumns: SortedSet<String> = sortedSetOf()) {
+    data class ColumnData(val columns: MutableList<String> = mutableListOf(), val refColumns: MutableList<String> = mutableListOf()) {
         fun add(column: String, refColumn: String?) {
             columns.add(column)
             refColumn?.let { refColumns.add(it) }
