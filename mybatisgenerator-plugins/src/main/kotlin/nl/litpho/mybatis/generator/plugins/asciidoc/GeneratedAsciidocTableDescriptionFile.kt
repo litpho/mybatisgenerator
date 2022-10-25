@@ -55,10 +55,10 @@ class GeneratedAsciidocTableDescriptionFile(
             val keyInfo = groupModel.keyInfoMap.getOrDefault(table, emptyMap())
             keyInfo.entries.filter { e -> e.key.type == "PRIMARY KEY" }
             for ((info, columnData) in keyInfo.entries.filter { e -> e.key.type == "PRIMARY KEY" }.sortedBy { it.key.name }) {
-                sb.append("|${info.label}|${info.name}|${info.type}|${columnData.columns.sortedBy { it }.joinToString(",")}|${info.remarks ?: ""}\n")
+                sb.append("|${info.label}|${info.name}|${info.type}|${columnData.columns.joinToString(",")}|${info.remarks ?: ""}\n")
             }
             for ((info, columnData) in keyInfo.entries.filter { e -> e.key.type == "UNIQUE" }.sortedBy { it.key.name }) {
-                sb.append("|${info.label}|${info.name}|${info.type}|${columnData.columns.sortedBy { it }.joinToString(",")}|${info.remarks ?: ""}\n")
+                sb.append("|${info.label}|${info.name}|${info.type}|${columnData.columns.joinToString(",")}|${info.remarks ?: ""}\n")
             }
             sb.append("|===\n")
             sb.append("\n")
