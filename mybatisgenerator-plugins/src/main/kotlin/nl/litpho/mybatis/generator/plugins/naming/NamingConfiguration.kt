@@ -6,7 +6,11 @@ import org.mybatis.generator.api.IntrospectedColumn
 import org.mybatis.generator.api.IntrospectedTable
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType
 
-data class NamingYaml(var default: Default? = null, var tables: MutableMap<String, Table> = mutableMapOf()) {
+data class NamingYaml(
+    var default: Default? = null,
+    var tables: MutableMap<String, Table> = mutableMapOf(),
+    var typeAliases: MutableMap<String, String> = mutableMapOf()
+) {
 
     fun toConfiguration(): NamingConfiguration = NamingConfiguration(this)
 
@@ -38,7 +42,8 @@ data class NamingConfiguration(private val namingYaml: NamingYaml) : PluginConfi
                 it.value.type,
                 it.value.prefix ?: namingYaml.default?.prefix ?: "",
                 it.value.columns,
-                namingYaml.default?.columns
+                namingYaml.default?.columns,
+                namingYaml.typeAliases
             )
         }.toMap()
 
@@ -52,14 +57,22 @@ class NamingConfigurationEntry(
     val type: String?,
     val prefix: String,
     columns: MutableMap<String, NamingYaml.Column>,
-    defaultColumns: MutableMap<String, NamingYaml.Column>?
+    defaultColumns: MutableMap<String, NamingYaml.Column>?,
+    private val typeAliases: MutableMap<String, String>
 ) {
     val columnOverrides: Map<String, ColumnBasedJavaPropertyOverride> =
-        columns.mapValues { ColumnBasedJavaPropertyOverride(it.value.property, it.value.type) }
+        columns.mapValues { ColumnBasedJavaPropertyOverride(it.value.property, it.value.type.applyTypeAlias()) }
     val columnDefaultValues: Map<String, String> =
         columns.filter { it.value.defaultValue != null }.mapValues { it.value.defaultValue!! }
 //    val ignoredColumns: List<String> =
 //        columns.filter { !it.ignore }.map { it.name!! }.toList()
+
+    private fun String?.applyTypeAlias(): String? =
+        if (this == null || !this.startsWith("$")) {
+            this
+        } else {
+            typeAliases[this.drop(1)] ?: this
+        }
 }
 
 class ColumnBasedJavaPropertyOverride(private val property: String?, private val type: String?) {
