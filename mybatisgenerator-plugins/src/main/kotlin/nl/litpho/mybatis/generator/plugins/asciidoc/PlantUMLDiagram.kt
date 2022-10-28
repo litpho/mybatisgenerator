@@ -12,6 +12,7 @@ class PlantUMLDiagram(
     private val groupModel: AsciidocGroupModel,
     private val targetPackage: String,
     private val allTables: Map<String, IntrospectedTable>,
+    private val asciidocConfiguration: AsciidocConfiguration,
     private val domainEnumConfiguration: DomainEnumConfiguration?,
     private val subpackageConfiguration: SubpackageConfiguration?
 ) : AsciidocContents {
@@ -78,11 +79,13 @@ class PlantUMLDiagram(
     private fun getNonEnumClass(introspectedTable: IntrospectedTable): List<String> {
         val list: MutableList<String> = mutableListOf()
         list.add("class ${introspectedTable.fullyQualifiedTableNameAtRuntime} << (T,MediumTurquoise) >> {")
-        if (introspectedTable.allColumns.isNotEmpty()) {
-            val prefixes = calculatePrefixes(introspectedTable, introspectedTable.allColumns)
+        val allColumns =
+            asciidocConfiguration.allColumns[introspectedTable.fullyQualifiedTableNameAtRuntime] ?: emptyList()
+        if (allColumns.isNotEmpty()) {
+            val prefixes = calculatePrefixes(introspectedTable, allColumns)
             val maxPrefixLength = prefixes.maxOf { it.length }
-            val maxColumnLength = introspectedTable.allColumns.maxOf { it.actualColumnName.length }
-            introspectedTable.allColumns.forEachIndexed { i, column ->
+            val maxColumnLength = allColumns.maxOf { it.actualColumnName.length }
+            allColumns.forEachIndexed { i, column ->
                 list.add(renderColumn(prefixes[i], column, maxPrefixLength, maxColumnLength))
             }
         }
@@ -111,7 +114,10 @@ class PlantUMLDiagram(
         return ceil((newMaxLength - value.length) / 8.0).toInt()
     }
 
-    private fun calculatePrefixes(introspectedTable: IntrospectedTable, columns: List<IntrospectedColumn>): List<String> =
+    private fun calculatePrefixes(
+        introspectedTable: IntrospectedTable,
+        columns: List<IntrospectedColumn>
+    ): List<String> =
         columns.map { column -> calculatePrefix(introspectedTable, column) }
 
     private fun calculatePrefix(introspectedTable: IntrospectedTable, column: IntrospectedColumn): String {
@@ -119,14 +125,15 @@ class PlantUMLDiagram(
         list.addAll(getLabels(introspectedTable, column, "PK"))
         list.addAll(getLabels(introspectedTable, column, "UK"))
         list.addAll(getLabels(introspectedTable, column, "FK"))
-//        groupModel.keyInfoMap[introspectedTable]?.filter { it.value.contains(column.actualColumnName) }?.keys?.map { it.label }?.filter { it?.startsWith("PK") ?: false }?.sortedBy { it }?.forEach { list.add(it!!) }
-//        groupModel.keyInfoMap[introspectedTable]?.filter { it.value.contains(column.actualColumnName) }?.keys?.map { it.label }?.filter { it?.startsWith("UK") ?: false }?.sortedBy { it }?.forEach { list.add(it!!) }
-//        groupModel.keyInfoMap[introspectedTable]?.filter { it.value.contains(column.actualColumnName) }?.keys?.map { it.label }?.filter { it?.startsWith("FK") ?: false }?.sortedBy { it }?.forEach { list.add(it!!) }
 
         return list.joinToString(",")
     }
 
-    private fun getLabels(introspectedTable: IntrospectedTable, introspectedColumn: IntrospectedColumn, prefix: String): List<String> {
+    private fun getLabels(
+        introspectedTable: IntrospectedTable,
+        introspectedColumn: IntrospectedColumn,
+        prefix: String
+    ): List<String> {
         return groupModel.keyInfoMap[introspectedTable]
             ?.filter { it.value.columns.contains(introspectedColumn.actualColumnName) }
             ?.keys

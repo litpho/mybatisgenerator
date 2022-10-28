@@ -71,9 +71,7 @@ class AsciidocPlugin : PluginAdapter() {
             )
             groupModel.calculateTablesToDocument()
             groupModels.add(groupModel)
-            generatedXmlFiles.addAll(
-                generateFiles(groupModel, allTables, tablesPerDiagram, subPackagePluginConfiguration, skipTablePluginConfiguration)
-            )
+            generatedXmlFiles.addAll(generateFiles(groupModel, allTables, tablesPerDiagram))
         }
 
         // Rest group
@@ -89,23 +87,7 @@ class AsciidocPlugin : PluginAdapter() {
             )
             groupModel.calculateTablesLeftToDocument(groupModels)
             groupModels.add(groupModel)
-            generatedXmlFiles.addAll(
-                generateFiles(groupModel, allTables, tablesPerDiagram, subPackagePluginConfiguration, skipTablePluginConfiguration)
-            )
-        }
-
-        // Generate usage tables
-        if (configuration.generateTablesTxt) {
-            val groupFileNames = groupModels.map { it.group.filename }
-            val generatedTablesPerDiagramFile = GeneratedTablesPerDiagramFile(
-                "tables-per-diagram.csv",
-                "",
-                outputDir,
-                tablesPerDiagram,
-                groupFileNames,
-                subPackagePluginConfiguration
-            )
-            generatedXmlFiles.add(generatedTablesPerDiagramFile)
+            generatedXmlFiles.addAll(generateFiles(groupModel, allTables, tablesPerDiagram))
         }
 
         return generatedXmlFiles
@@ -114,25 +96,11 @@ class AsciidocPlugin : PluginAdapter() {
     private fun generateFiles(
         groupModel: AsciidocGroupModel,
         allTables: Map<String, IntrospectedTable>,
-        tablesPerDiagram: MutableMap<IntrospectedTable, MutableList<String>>,
-        subPackagePluginConfiguration: SubpackageConfiguration?,
-        skipTablePluginConfiguration: SkipConfiguration?
+        tablesPerDiagram: MutableMap<IntrospectedTable, MutableList<String>>
     ): List<GeneratedXmlFile> {
         val generatedXmlFiles: MutableList<GeneratedXmlFile> = mutableListOf()
         generatedXmlFiles.add(generateDiagram(groupModel, allTables, tablesPerDiagram))
         generatedXmlFiles.add(generateTableDescription(groupModel))
-        if (configuration.generateTablesTxt) {
-            val generatedTableUsageFile = GeneratedTableUsageFile(
-                "${groupModel.group.filename}-tables.txt",
-                "",
-                outputDir,
-                groupModel,
-                allTables,
-                subPackagePluginConfiguration,
-                skipTablePluginConfiguration
-            )
-            generatedXmlFiles.add(generatedTableUsageFile)
-        }
 
         return generatedXmlFiles
     }
@@ -152,6 +120,7 @@ class AsciidocPlugin : PluginAdapter() {
             groupModel,
             context.javaModelGeneratorConfiguration.targetPackage,
             allTables,
+            configuration,
             domeinEnumPluginConfiguration,
             subPackagePluginConfiguration
         )
@@ -159,5 +128,5 @@ class AsciidocPlugin : PluginAdapter() {
     }
 
     private fun generateTableDescription(groupModel: AsciidocGroupModel): GeneratedAsciidocTableDescriptionFile =
-        GeneratedAsciidocTableDescriptionFile(groupModel.group, outputDir, groupModel)
+        GeneratedAsciidocTableDescriptionFile(groupModel.group, outputDir, configuration, groupModel)
 }

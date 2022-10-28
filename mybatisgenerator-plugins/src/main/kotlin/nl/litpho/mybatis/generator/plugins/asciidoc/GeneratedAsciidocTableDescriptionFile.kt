@@ -8,6 +8,7 @@ import java.sql.Types
 class GeneratedAsciidocTableDescriptionFile(
     group: GroupDefinition,
     targetProject: String,
+    private val configuration: AsciidocConfiguration,
     private val groupModel: AsciidocGroupModel
 ) : GeneratedFlatFile(group.filename + "-table-description.adoc", "", targetProject) {
 
@@ -34,7 +35,8 @@ class GeneratedAsciidocTableDescriptionFile(
                     .append(column.remarks ?: "")
                     .append("\n")
             }
-            for (column in table.nonPrimaryKeyColumns) {
+            val nonPrimaryKeyColumns = configuration.nonPrimaryKeyColumns[table.fullyQualifiedTableNameAtRuntime] ?: emptyList()
+            for (column in nonPrimaryKeyColumns) {
                 sb.append("|")
                     .append(column.actualColumnName)
                     .append("|")

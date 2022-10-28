@@ -1,9 +1,9 @@
 package nl.litpho.mybatis.generator.plugins.asciidoc
 
 import nl.litpho.mybatis.generator.plugins.PluginConfiguration
+import org.mybatis.generator.api.IntrospectedColumn
 
 data class AsciidocYaml(
-    var generateTablesTxt: Boolean = false,
     var groups: MutableList<GroupData> = mutableListOf(),
     var restGroup: GroupData? = null
 ) {
@@ -22,8 +22,6 @@ data class AsciidocYaml(
 }
 
 class AsciidocConfiguration(configuration: AsciidocYaml) : PluginConfiguration {
-
-    val generateTablesTxt: Boolean = configuration.generateTablesTxt
 
     val groups: List<GroupDefinition> = configuration.groups
         .map { groupData ->
@@ -49,6 +47,9 @@ class AsciidocConfiguration(configuration: AsciidocYaml) : PluginConfiguration {
             groupData.excludeTables
         )
     }
+
+    val allColumns: MutableMap<String, List<IntrospectedColumn>> = mutableMapOf()
+    val nonPrimaryKeyColumns: MutableMap<String, List<IntrospectedColumn>> = mutableMapOf()
 
     data class GroupDefinition(
         val name: String,

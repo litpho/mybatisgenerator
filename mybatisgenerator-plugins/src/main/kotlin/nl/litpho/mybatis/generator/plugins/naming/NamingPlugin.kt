@@ -1,5 +1,6 @@
 package nl.litpho.mybatis.generator.plugins.naming
 
+import nl.litpho.mybatis.generator.plugins.asciidoc.AsciidocConfiguration
 import nl.litpho.mybatis.generator.plugins.util.ConfigurationUtil
 import nl.litpho.mybatis.generator.plugins.util.readConfigurationFromYaml
 import org.mybatis.generator.api.IntrospectedTable
@@ -22,9 +23,14 @@ class NamingPlugin : PluginAdapter() {
     }
 
     override fun initialized(introspectedTable: IntrospectedTable) {
+        val asciidocConfiguration = ConfigurationUtil.getPluginConfigurationNull<AsciidocConfiguration>()
+        if (asciidocConfiguration != null) {
+            asciidocConfiguration.allColumns[introspectedTable.fullyQualifiedTableNameAtRuntime] = introspectedTable.allColumns
+            asciidocConfiguration.nonPrimaryKeyColumns[introspectedTable.fullyQualifiedTableNameAtRuntime] = introspectedTable.nonPrimaryKeyColumns
+        }
+
         val namingConfigurationEntry =
             configuration.namingConfigurationEntryMap[introspectedTable.aliasedFullyQualifiedTableNameAtRuntime]
-
         if (namingConfigurationEntry != null) {
             initializeIntrospectedTable(introspectedTable, namingConfigurationEntry)
 
