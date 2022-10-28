@@ -42,6 +42,8 @@ data class NamingConfiguration(private val namingYaml: NamingYaml) : PluginConfi
                 it.value.type,
                 it.value.prefix ?: namingYaml.default?.prefix ?: "",
                 it.value.columns,
+                it.value.ignoredColumns,
+                namingYaml.default?.ignoredColumns,
                 namingYaml.default?.columns,
                 namingYaml.typeAliases
             )
@@ -57,6 +59,8 @@ class NamingConfigurationEntry(
     val type: String?,
     val prefix: String,
     columns: MutableMap<String, NamingYaml.Column>,
+    ignoredColumns: List<String>,
+    defaultIgnoredColumns: List<String>?,
     private val defaultColumns: MutableMap<String, NamingYaml.Column>?,
     private val typeAliases: MutableMap<String, String>
 ) {
@@ -87,8 +91,7 @@ class NamingConfigurationEntry(
                 }
                 map
             }
-//    val ignoredColumns: List<String> =
-//        columns.filter { !it.ignore }.map { it.name!! }.toList()
+    val ignoredColumns: List<String> = ignoredColumns + (defaultIgnoredColumns ?: emptyList())
 
     private fun String?.applyTypeAlias(): String? =
         if (this == null || !this.startsWith("$")) {
@@ -96,12 +99,6 @@ class NamingConfigurationEntry(
         } else {
             typeAliases[this.drop(1)] ?: this
         }
-
-    private fun String?.applyDefaultColumnProperty(columnName: String): String? =
-        this ?: defaultColumns?.get(columnName)?.property
-
-    private fun String?.applyDefaultColumnType(columnName: String): String? =
-        this ?: defaultColumns?.get(columnName)?.type
 }
 
 class ColumnBasedJavaPropertyOverride(val property: String?, val type: String?) {

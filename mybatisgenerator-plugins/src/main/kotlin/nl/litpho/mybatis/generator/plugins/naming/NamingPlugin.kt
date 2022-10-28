@@ -60,6 +60,10 @@ class NamingPlugin : PluginAdapter() {
             if (sqlMapGeneratorConfiguration != null) {
                 myBatis3XmlMapperFileName = "${typeName}Mapper.xml"
             }
+
+            primaryKeyColumns.removeIf { it.actualColumnName in namingConfigurationEntry.ignoredColumns }
+            baseColumns.removeIf { it.actualColumnName in namingConfigurationEntry.ignoredColumns }
+            blobColumns.removeIf { it.actualColumnName in namingConfigurationEntry.ignoredColumns }
         }
     }
 
