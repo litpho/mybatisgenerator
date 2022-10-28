@@ -57,13 +57,36 @@ class NamingConfigurationEntry(
     val type: String?,
     val prefix: String,
     columns: MutableMap<String, NamingYaml.Column>,
-    defaultColumns: MutableMap<String, NamingYaml.Column>?,
+    private val defaultColumns: MutableMap<String, NamingYaml.Column>?,
     private val typeAliases: MutableMap<String, String>
 ) {
     val columnOverrides: Map<String, ColumnBasedJavaPropertyOverride> =
         columns.mapValues { ColumnBasedJavaPropertyOverride(it.value.property, it.value.type.applyTypeAlias()) }
+            .toMutableMap()
+            .let { map ->
+                defaultColumns?.forEach { (key, defCol) ->
+                    val original: ColumnBasedJavaPropertyOverride? = map[key]
+                    val override =
+                        ColumnBasedJavaPropertyOverride(
+                            original?.property ?: defCol.property,
+                            original?.type ?: defCol.type.applyTypeAlias()
+                        )
+                    map[key] = override
+                }
+                map
+            }
     val columnDefaultValues: Map<String, String> =
-        columns.filter { it.value.defaultValue != null }.mapValues { it.value.defaultValue!! }
+        columns.filter { it.value.defaultValue != null }
+            .mapValues { it.value.defaultValue!! }
+            .toMutableMap()
+            .let { map ->
+                defaultColumns?.forEach { (key, defCol) ->
+                    val original: String? = map[key]
+                    val override = original ?: defCol.defaultValue
+                    override?.let { map[key] = it }
+                }
+                map
+            }
 //    val ignoredColumns: List<String> =
 //        columns.filter { !it.ignore }.map { it.name!! }.toList()
 
@@ -73,9 +96,15 @@ class NamingConfigurationEntry(
         } else {
             typeAliases[this.drop(1)] ?: this
         }
+
+    private fun String?.applyDefaultColumnProperty(columnName: String): String? =
+        this ?: defaultColumns?.get(columnName)?.property
+
+    private fun String?.applyDefaultColumnType(columnName: String): String? =
+        this ?: defaultColumns?.get(columnName)?.type
 }
 
-class ColumnBasedJavaPropertyOverride(private val property: String?, private val type: String?) {
+class ColumnBasedJavaPropertyOverride(val property: String?, val type: String?) {
 
     private val logger = createLogger<ColumnBasedJavaPropertyOverride>()
 
