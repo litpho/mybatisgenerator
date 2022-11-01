@@ -7,5 +7,5 @@ pluginManagement {
 
 rootProject.name = "mybatisgenerator"
 
-include("mybatis-library")
+include("mybatisgenerator-library")
 include("mybatisgenerator-plugins")
