@@ -55,7 +55,7 @@ class DomainEnumUsageDecorator(private val introspectedTable: IntrospectedTable,
         if (namingConfiguration != null) {
             val parseResultForTable: NamingConfigurationEntry? = namingConfiguration.getTableConfiguration(enumTableName)
             if (parseResultForTable?.type != null) {
-                return "$pakkage.${parseResultForTable.type}"
+                return "$pakkage.${parseResultForTable.prefix}${parseResultForTable.type}"
             }
         }
 
