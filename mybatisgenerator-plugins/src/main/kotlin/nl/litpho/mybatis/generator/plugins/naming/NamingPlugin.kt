@@ -81,6 +81,6 @@ class NamingPlugin : PluginAdapter() {
             val fqjt = FullyQualifiedJavaType(introspectedTable.baseRecordType)
             namingConfigurationEntry.prefix + fqjt.shortName
         } else {
-            namingConfigurationEntry.type
+            namingConfigurationEntry.prefix + namingConfigurationEntry.type
         }
 }

@@ -1,12 +1,13 @@
-prefix: DB
+default:
+  prefix: DB
 tables:
-  - name: TEST
+  TEST:
     type: MyTest
     columns:
-      - name: CONTENT
+      CONTENT:
         property: inhoud
-  - name: TEST2
+  TEST2:
     prefix: AB
     columns:
-      - name: FLAG
+      FLAG:
         type: boolean
