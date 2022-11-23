@@ -4,11 +4,20 @@ import nl.litpho.mybatis.generator.plugins.PluginConfiguration
 import org.mybatis.generator.api.IntrospectedColumn
 
 data class AsciidocYaml(
+    var style: Style = Style(),
     var groups: MutableList<GroupData> = mutableListOf(),
     var restGroup: GroupData? = null
 ) {
 
     fun toConfiguration(): AsciidocConfiguration = AsciidocConfiguration(this)
+
+    data class Style(
+        var theme: String? = null,
+        var externalBackgroundColor: String = "LightGrey",
+        var enumDotColor: String = "DarkSalmon",
+        var tableDotColor: String = "MediumTurquoise",
+        var ortho: Boolean = true
+    )
 
     data class GroupData(
         var name: String? = null,
@@ -22,6 +31,8 @@ data class AsciidocYaml(
 }
 
 class AsciidocConfiguration(configuration: AsciidocYaml) : PluginConfiguration {
+
+    val style: AsciidocYaml.Style? = configuration.style
 
     val groups: List<GroupDefinition> = configuration.groups
         .map { groupData ->

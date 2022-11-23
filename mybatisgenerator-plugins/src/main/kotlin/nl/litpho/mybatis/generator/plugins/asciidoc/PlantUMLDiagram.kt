@@ -25,8 +25,11 @@ class PlantUMLDiagram(
         list.add(".${group.name}")
         list.add("[plantuml, ${group.filename}, svg]")
         list.add("----")
+        asciidocConfiguration.style?.theme?.let { list.add("!theme $it") }
         list.add("skinparam classAttributeFontName Courier")
-        list.add("skinparam linetype ortho")
+        if (asciidocConfiguration.style?.ortho != false) {
+            list.add("skinparam linetype ortho")
+        }
         list.add("package \"${group.name}\" <<Rectangle>> {")
         list.addAll(getIncludedClasses(includedMap))
         list.add("}")
@@ -67,7 +70,7 @@ class PlantUMLDiagram(
 
     private fun getEnumClass(introspectedTable: IntrospectedTable): List<String> {
         val list: MutableList<String> = mutableListOf()
-        list.add("enum ${introspectedTable.fullyQualifiedTableNameAtRuntime} {")
+        list.add("enum ${introspectedTable.fullyQualifiedTableNameAtRuntime} << (E,${asciidocConfiguration.style?.enumDotColor}) >> {")
         domainEnumConfiguration?.getEnumConstants(introspectedTable)?.let {
             list.addAll(it.map { enumConstant -> "\t$enumConstant" })
         }
@@ -78,7 +81,7 @@ class PlantUMLDiagram(
 
     private fun getNonEnumClass(introspectedTable: IntrospectedTable): List<String> {
         val list: MutableList<String> = mutableListOf()
-        list.add("class ${introspectedTable.fullyQualifiedTableNameAtRuntime} << (T,MediumTurquoise) >> {")
+        list.add("class ${introspectedTable.fullyQualifiedTableNameAtRuntime} << (T,${asciidocConfiguration.style?.tableDotColor}) >> {")
         val allColumns =
             asciidocConfiguration.allColumns[introspectedTable.fullyQualifiedTableNameAtRuntime] ?: emptyList()
         if (allColumns.isNotEmpty()) {
@@ -145,10 +148,17 @@ class PlantUMLDiagram(
 
     private fun getExcludedClasses(excludedMap: Map<String, MutableSet<IntrospectedTable>>): List<String> {
         val list: MutableList<String> = mutableListOf()
+        val excludedBackgroundColour = asciidocConfiguration.style?.externalBackgroundColor?.let {
+            if (it.startsWith("#")) {
+                it
+            } else {
+                "#$it"
+            }
+        }
         excludedMap.keys
             .sorted()
             .forEach { excludedPackage ->
-                list.add("package \"external: $excludedPackage\" <<Rectangle>> #lightgrey {")
+                list.add("package \"external: $excludedPackage\" <<Rectangle>> $excludedBackgroundColour {")
                 for (introspectedTable: IntrospectedTable in excludedMap.getValue(excludedPackage)) {
                     list.add("\tclass ${introspectedTable.aliasedFullyQualifiedTableNameAtRuntime}")
                 }
