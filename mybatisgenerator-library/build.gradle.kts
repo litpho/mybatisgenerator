@@ -2,13 +2,14 @@ plugins {
     `java-library`
     `maven-publish`
     id("com.diffplug.spotless")
+    id("org.owasp.dependencycheck")
 }
 
 val junitVersion: String by project
 
 dependencies {
-    api("org.mybatis:mybatis:3.5.1")
-    api("org.mybatis.dynamic-sql:mybatis-dynamic-sql:1.4.0")
+    api("org.mybatis:mybatis:3.5.11")
+    api("org.mybatis.dynamic-sql:mybatis-dynamic-sql:1.4.1")
 
     implementation("xyz.downgoon:snowflake:1.0.0")
 
@@ -42,4 +43,8 @@ spotless {
     java {
         googleJavaFormat()
     }
+}
+
+dependencyCheck {
+    this.suppressionFile = "${project.rootDir}/gradle/suppressions.xml"
 }

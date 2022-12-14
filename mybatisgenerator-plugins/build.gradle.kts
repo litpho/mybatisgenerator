@@ -6,6 +6,7 @@ plugins {
     `maven-publish`
     id("com.diffplug.spotless")
     id("org.jetbrains.kotlin.jvm")
+    id("org.owasp.dependencycheck")
 }
 
 java {
@@ -59,4 +60,8 @@ spotless {
     kotlin {
         ktlint()
     }
+}
+
+dependencyCheck {
+    this.suppressionFile = "${project.rootDir}/gradle/suppressions.xml"
 }
