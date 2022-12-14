@@ -112,6 +112,7 @@ class BaseRecordClassBuilderFactory(
         return when (introspectedColumn.fullyQualifiedJavaType.fullyQualifiedName) {
             "java.lang.String" -> "\"" + defaultValue + "\""
             "java.lang.Boolean", "boolean" -> determineDefaultBooleanValue(introspectedColumn, defaultValue)
+            "java.lang.Integer", "int" -> defaultValue
             "java.lang.Long", "long" -> "${defaultValue}L"
             "java.math.BigInteger" ->
                 when (defaultValue) {
