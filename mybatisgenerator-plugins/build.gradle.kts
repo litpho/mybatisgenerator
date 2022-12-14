@@ -33,10 +33,10 @@ dependencies {
     implementation("org.mybatis.generator:mybatis-generator-core:1.4.1")
     implementation("org.yaml:snakeyaml:1.33")
 
-    testImplementation("com.github.javaparser:javaparser-core:3.24.4")
+    testImplementation("com.github.javaparser:javaparser-core:3.24.8")
     testImplementation("com.h2database:h2:$h2DriverVersion")
-    testImplementation("io.kotest:kotest-assertions-core-jvm:5.4.2")
-    testImplementation("io.mockk:mockk:1.12.5")
+    testImplementation("io.kotest:kotest-assertions-core-jvm:5.5.4")
+    testImplementation("io.mockk:mockk:1.13.3")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
 
