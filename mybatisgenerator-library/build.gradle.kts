@@ -1,6 +1,7 @@
 plugins {
     `java-library`
     `maven-publish`
+    signing
     id("com.diffplug.spotless")
     id("org.owasp.dependencycheck")
 }
@@ -23,9 +24,9 @@ java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
 
+    withJavadocJar()
     withSourcesJar()
 }
-
 
 tasks.test {
     useJUnitPlatform()
@@ -39,6 +40,10 @@ publishing {
     }
 }
 
+signing {
+    sign(publishing.publications["main"])
+}
+
 spotless {
     java {
         googleJavaFormat()
@@ -46,5 +51,5 @@ spotless {
 }
 
 dependencyCheck {
-    this.suppressionFile = "${project.rootDir}/gradle/suppressions.xml"
+    suppressionFile = "${project.rootDir}/gradle/suppressions.xml"
 }

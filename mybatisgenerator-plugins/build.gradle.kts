@@ -4,6 +4,7 @@ plugins {
     jacoco
     `java-library`
     `maven-publish`
+    signing
     id("com.diffplug.spotless")
     id("org.jetbrains.kotlin.jvm")
     id("org.owasp.dependencycheck")
@@ -13,6 +14,7 @@ java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
 
+    withJavadocJar()
     withSourcesJar()
 }
 
@@ -34,7 +36,7 @@ dependencies {
     implementation("org.mybatis.generator:mybatis-generator-core:1.4.1")
     implementation("org.yaml:snakeyaml:1.33")
 
-    testImplementation("com.github.javaparser:javaparser-core:3.24.8")
+    testImplementation("com.github.javaparser:javaparser-core:3.24.9")
     testImplementation("com.h2database:h2:$h2DriverVersion")
     testImplementation("io.kotest:kotest-assertions-core-jvm:5.5.4")
     testImplementation("io.mockk:mockk:1.13.3")
@@ -56,6 +58,10 @@ publishing {
     }
 }
 
+signing {
+    sign(publishing.publications["main"])
+}
+
 spotless {
     kotlin {
         ktlint()
@@ -63,5 +69,5 @@ spotless {
 }
 
 dependencyCheck {
-    this.suppressionFile = "${project.rootDir}/gradle/suppressions.xml"
+    suppressionFile = "${project.rootDir}/gradle/suppressions.xml"
 }
