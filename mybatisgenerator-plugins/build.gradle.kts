@@ -81,6 +81,13 @@ publishing {
             }
         }
     }
+    repositories {
+        maven {
+            name = "ossrh"
+            credentials(PasswordCredentials::class)
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+        }
+    }
 }
 
 signing {
