@@ -8,6 +8,7 @@ plugins {
     id("com.diffplug.spotless")
     id("org.jetbrains.kotlin.jvm")
     id("org.owasp.dependencycheck")
+    id("pl.allegro.tech.build.axion-release")
 }
 
 java {
@@ -54,6 +55,30 @@ publishing {
     publications {
         create<MavenPublication>("main") {
             from(components["java"])
+
+            pom {
+                name.set("MyBatis Generator Plugins")
+                description.set("A set of MyBatis Generator plugins to extend the prepackaged capabilities")
+                url.set("https://github.com/litpho/mybatisgenerator")
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://opensource.org/licenses/MIT")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("litpho")
+                        name.set("Jasper de Vries")
+                        email.set("jasper.devries@the-future-group.com")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/mybatisgenerator.git")
+                    developerConnection.set("scm:git:git://github.com/mybatisgenerator.git")
+                    url.set("https://github.com/litpho/mybatisgenerator")
+                }
+            }
         }
     }
 }

@@ -4,9 +4,11 @@ plugins {
     id("pl.allegro.tech.build.axion-release") version("1.14.3")
 }
 
-project.version = scmVersion.version
-
 allprojects {
+    plugins.withId("pl.allegro.tech.build.axion-release") {
+        project.version = scmVersion.version
+    }
+
     repositories {
         mavenCentral()
     }
