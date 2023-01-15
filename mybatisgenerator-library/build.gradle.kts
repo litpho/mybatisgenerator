@@ -7,18 +7,16 @@ plugins {
     id("pl.allegro.tech.build.axion-release")
 }
 
-val junitVersion: String by project
-
 dependencies {
-    api("org.mybatis:mybatis:3.5.11")
-    api("org.mybatis.dynamic-sql:mybatis-dynamic-sql:1.4.1")
+    api("org.mybatis:mybatis:3.+")
+    api("org.mybatis.dynamic-sql:mybatis-dynamic-sql:1.+")
 
-    implementation("xyz.downgoon:snowflake:1.0.0")
+    implementation("xyz.downgoon:snowflake:1.+")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.+")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.+")
 
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.+")
 }
 
 java {
@@ -37,6 +35,14 @@ publishing {
     publications {
         create<MavenPublication>("main") {
             from(components["java"])
+            versionMapping {
+                usage("java-api") {
+                    fromResolutionOf("runtimeClasspath")
+                }
+                usage("java-runtime") {
+                    fromResolutionResult()
+                }
+            }
 
             pom {
                 name.set("MyBatis Generator Plugins Library")

@@ -26,25 +26,22 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-val h2DriverVersion: String by project
-val junitVersion: String by project
-
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
+
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.mybatis:mybatis:3.+")
+    implementation("org.mybatis.generator:mybatis-generator-core:1.+")
+    implementation("org.yaml:snakeyaml:1.+")
 
-    implementation("org.mybatis:mybatis:3.5.11")
-    implementation("org.mybatis.generator:mybatis-generator-core:1.4.1")
-    implementation("org.yaml:snakeyaml:1.33")
+    testImplementation("com.github.javaparser:javaparser-core:3.+")
+    testImplementation("com.h2database:h2:2.+")
+    testImplementation("io.kotest:kotest-assertions-core-jvm:5.+")
+    testImplementation("io.mockk:mockk:1.+")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.+")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.+")
 
-    testImplementation("com.github.javaparser:javaparser-core:3.24.9")
-    testImplementation("com.h2database:h2:$h2DriverVersion")
-    testImplementation("io.kotest:kotest-assertions-core-jvm:5.5.4")
-    testImplementation("io.mockk:mockk:1.13.3")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
-
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.+")
 }
 
 tasks.test {
@@ -55,6 +52,14 @@ publishing {
     publications {
         create<MavenPublication>("main") {
             from(components["java"])
+            versionMapping {
+                usage("java-api") {
+                    fromResolutionOf("runtimeClasspath")
+                }
+                usage("java-runtime") {
+                    fromResolutionResult()
+                }
+            }
 
             pom {
                 name.set("MyBatis Generator Plugins")
