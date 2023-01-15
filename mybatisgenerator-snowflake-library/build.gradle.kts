@@ -1,4 +1,5 @@
 plugins {
+    jacoco
     `java-library`
     `maven-publish`
     signing
@@ -10,10 +11,14 @@ plugins {
 dependencies {
     api(project(":mybatisgenerator-library"))
 
+    implementation("com.google.code.findbugs:jsr305:3.+")
     implementation("xyz.downgoon:snowflake:1.+")
 
+    testImplementation("org.assertj:assertj-core:3.+")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.+")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.+")
+    testImplementation("org.mockito:mockito-core:5.+")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.+")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.+")
 }

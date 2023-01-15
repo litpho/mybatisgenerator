@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class UUIDGenerator implements IdGenerator<UUID> {
   @Override
-  public boolean supports(Class<?> keyType) {
+  public boolean supports(final Class<?> keyType) {
     return keyType == UUID.class;
   }
 

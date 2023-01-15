@@ -7,14 +7,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import nl.litpho.mybatis.enumsupport.DatabaseValueEnum;
+import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
-import org.apache.ibatis.type.TypeHandler;
 
 @MappedTypes(DatabaseValueEnum.class)
 public class DatabaseValueEnumTypeHandler<E extends Enum<E> & DatabaseValueEnum>
-    implements TypeHandler<E> {
+    extends BaseTypeHandler<E> {
 
   private final Class<E> type;
 
@@ -23,31 +25,41 @@ public class DatabaseValueEnumTypeHandler<E extends Enum<E> & DatabaseValueEnum>
   }
 
   @Override
-  public void setParameter(
+  public void setNonNullParameter(
       final PreparedStatement ps,
       final int parameterIndex,
       final E parameter,
-      final JdbcType jdbcType)
+      @Nullable final JdbcType jdbcType)
       throws SQLException {
     ps.setString(parameterIndex, parameter.getDatabaseValue());
   }
 
   @Override
-  public E getResult(final ResultSet rs, final String columnName) throws SQLException {
+  @CheckForNull
+  public E getNullableResult(final ResultSet rs, final String columnName) throws SQLException {
     return toEnumValue(rs.getString(columnName));
   }
 
   @Override
-  public E getResult(final ResultSet rs, final int columnIndex) throws SQLException {
+  @CheckForNull
+  public E getNullableResult(final ResultSet rs, final int columnIndex) throws SQLException {
     return toEnumValue(rs.getString(columnIndex));
   }
 
   @Override
-  public E getResult(final CallableStatement cs, final int columnIndex) throws SQLException {
+  @CheckForNull
+  public E getNullableResult(final CallableStatement cs, final int columnIndex)
+      throws SQLException {
     return toEnumValue(cs.getString(columnIndex));
   }
 
-  private E toEnumValue(final String databaseValue) {
+  // Visible for testing
+  @CheckForNull
+  E toEnumValue(@CheckForNull final String databaseValue) {
+    if (databaseValue == null) {
+      return null;
+    }
+
     return Arrays.stream(type.getEnumConstants())
         .filter(value -> value.getDatabaseValue().equals(databaseValue))
         .findFirst()

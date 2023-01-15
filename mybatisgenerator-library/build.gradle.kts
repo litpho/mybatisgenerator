@@ -1,4 +1,5 @@
 plugins {
+    jacoco
     `java-library`
     `maven-publish`
     signing
@@ -11,8 +12,13 @@ dependencies {
     api("org.mybatis:mybatis:3.+")
     api("org.mybatis.dynamic-sql:mybatis-dynamic-sql:1.+")
 
+    implementation("com.google.code.findbugs:jsr305:3.+")
+
+    testImplementation("org.assertj:assertj-core:3.+")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.+")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.+")
+    testImplementation("org.mockito:mockito-core:5.+")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.+")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.+")
 }

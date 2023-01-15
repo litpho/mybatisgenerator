@@ -6,58 +6,59 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
-import org.apache.ibatis.type.TypeHandler;
 
 @MappedTypes(UUID.class)
-public class OracleUUIDTypeHandler implements TypeHandler<UUID> {
+public class OracleUUIDTypeHandler extends BaseTypeHandler<UUID> {
 
   @Override
-  public void setParameter(
-      PreparedStatement ps, int parameterIndex, UUID parameter, JdbcType jdbcType)
+  public void setNonNullParameter(
+      final PreparedStatement ps,
+      final int parameterIndex,
+      final UUID parameter,
+      @Nullable final JdbcType jdbcType)
       throws SQLException {
     ps.setBytes(parameterIndex, toBytes(parameter));
   }
 
   @Override
-  public UUID getResult(ResultSet rs, String columnName) throws SQLException {
-    final byte[] bytes = rs.getBytes(columnName);
-    if (bytes == null) {
-      return null;
-    }
-    return toUUID(bytes);
+  public UUID getNullableResult(final ResultSet rs, final String columnName) throws SQLException {
+    return toUUID(rs.getBytes(columnName));
   }
 
   @Override
-  public UUID getResult(ResultSet rs, int columnIndex) throws SQLException {
-    final byte[] bytes = rs.getBytes(columnIndex);
-    if (bytes == null) {
-      return null;
-    }
-    return toUUID(bytes);
+  public UUID getNullableResult(final ResultSet rs, final int columnIndex) throws SQLException {
+    return toUUID(rs.getBytes(columnIndex));
   }
 
   @Override
-  public UUID getResult(CallableStatement cs, int columnIndex) throws SQLException {
-    final byte[] bytes = cs.getBytes(columnIndex);
-    if (bytes == null) {
-      return null;
-    }
-    return toUUID(bytes);
+  public UUID getNullableResult(final CallableStatement cs, final int columnIndex)
+      throws SQLException {
+    return toUUID(cs.getBytes(columnIndex));
   }
 
-  private byte[] toBytes(final UUID uuid) {
-    ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
+  // Visible for testing
+  byte[] toBytes(final UUID uuid) {
+    final ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
     bb.putLong(uuid.getMostSignificantBits());
     bb.putLong(uuid.getLeastSignificantBits());
     return bb.array();
   }
 
-  private UUID toUUID(final byte[] bytes) {
-    ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
-    long high = byteBuffer.getLong();
-    long low = byteBuffer.getLong();
+  // Visible for testing
+  @CheckForNull
+  UUID toUUID(@CheckForNull final byte[] bytes) {
+    if (bytes == null) {
+      return null;
+    }
+
+    final ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+    final long high = byteBuffer.getLong();
+    final long low = byteBuffer.getLong();
     return new UUID(high, low);
   }
 }
