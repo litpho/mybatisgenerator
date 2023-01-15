@@ -1,5 +1,6 @@
-package nl.litpho.mybatis.idgenerators;
+package nl.litpho.mybatis.snowflake.idgenerators;
 
+import nl.litpho.mybatis.idgenerators.IdGenerator;
 import xyz.downgoon.snowflake.Snowflake;
 
 public class LongIdGenerator implements IdGenerator<Long> {

@@ -12,7 +12,6 @@ public class IdGenerators {
     for (IdGenerator idGenerator : ServiceLoader.load(IdGenerator.class)) {
       ID_GENERATORS.add(idGenerator);
     }
-    ID_GENERATORS.add(new LongIdGenerator());
     ID_GENERATORS.add(new UUIDGenerator());
   }
 

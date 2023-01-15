@@ -11,4 +11,5 @@ com.google.j2objc:j2objc-annotations:1.3=spotless865455342
 org.checkerframework:checker-qual:3.12.0=spotless865455342
 org.mybatis.dynamic-sql:mybatis-dynamic-sql:1.4.1=compileClasspath
 org.mybatis:mybatis:3.5.11=compileClasspath
+xyz.downgoon:snowflake:1.0.0=compileClasspath
 empty=annotationProcessor

@@ -9,3 +9,4 @@ rootProject.name = "mybatisgenerator"
 
 include("mybatisgenerator-library")
 include("mybatisgenerator-plugins")
+include("mybatisgenerator-snowflake-library")

@@ -8,8 +8,9 @@ plugins {
 }
 
 dependencies {
-    api("org.mybatis:mybatis:3.+")
-    api("org.mybatis.dynamic-sql:mybatis-dynamic-sql:1.+")
+    api(project(":mybatisgenerator-library"))
+
+    implementation("xyz.downgoon:snowflake:1.+")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.+")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.+")
@@ -43,8 +44,8 @@ publishing {
             }
 
             pom {
-                name.set("MyBatis Generator Plugins Library")
-                description.set("A library to support the extended MyBatis Generator plugins")
+                name.set("MyBatis Generator Plugins Snowflake Library")
+                description.set("A library to support the Snowflake Long Id generation for the extended MyBatis Generator plugins")
                 url.set("https://github.com/litpho/mybatisgenerator")
                 licenses {
                     license {
