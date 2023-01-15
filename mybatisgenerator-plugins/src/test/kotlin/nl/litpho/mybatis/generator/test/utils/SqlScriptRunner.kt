@@ -8,14 +8,14 @@ class SqlScriptRunner(
     private val driverClass: String,
     private val jdbcUrl: String,
     private val username: String,
-    private val password: String
+    private val password: String,
 ) {
 
     constructor(props: Properties) : this(
         props.getProperty("driverClassName"),
         props.getProperty("jdbcUrl"),
         props.getProperty("username"),
-        props.getProperty("password")
+        props.getProperty("password"),
     )
 
     fun executeScriptFromClasspath(location: String) {

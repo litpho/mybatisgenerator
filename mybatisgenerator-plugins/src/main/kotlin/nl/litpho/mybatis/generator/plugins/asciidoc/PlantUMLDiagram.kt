@@ -14,7 +14,7 @@ class PlantUMLDiagram(
     private val allTables: Map<String, IntrospectedTable>,
     private val asciidocConfiguration: AsciidocConfiguration,
     private val domainEnumConfiguration: DomainEnumConfiguration?,
-    private val subpackageConfiguration: SubpackageConfiguration?
+    private val subpackageConfiguration: SubpackageConfiguration?,
 ) : AsciidocContents {
 
     override fun getFormattedContent(): String {
@@ -101,7 +101,7 @@ class PlantUMLDiagram(
         prefix: String,
         introspectedColumn: IntrospectedColumn,
         maxPrefixLength: Int,
-        maxColumnLength: Int
+        maxColumnLength: Int,
     ): String {
         val numPrefixTabs: Int = calculateNumTabs(maxPrefixLength, prefix)
         val numColumnTabs: Int = calculateNumTabs(maxColumnLength, introspectedColumn.actualColumnName)
@@ -119,7 +119,7 @@ class PlantUMLDiagram(
 
     private fun calculatePrefixes(
         introspectedTable: IntrospectedTable,
-        columns: List<IntrospectedColumn>
+        columns: List<IntrospectedColumn>,
     ): List<String> =
         columns.map { column -> calculatePrefix(introspectedTable, column) }
 
@@ -135,7 +135,7 @@ class PlantUMLDiagram(
     private fun getLabels(
         introspectedTable: IntrospectedTable,
         introspectedColumn: IntrospectedColumn,
-        prefix: String
+        prefix: String,
     ): List<String> {
         return groupModel.keyInfoMap[introspectedTable]
             ?.filter { it.value.columns.contains(introspectedColumn.actualColumnName) }
@@ -224,7 +224,7 @@ class PlantUMLDiagram(
         tableName: String,
         fullPackage: String,
         keyPackage: String,
-        fullRootPackage: String
+        fullRootPackage: String,
     ) =
         groupModel.group.includeTables.contains(tableName) ||
             groupModel.group.includePackages.contains(keyPackage) ||

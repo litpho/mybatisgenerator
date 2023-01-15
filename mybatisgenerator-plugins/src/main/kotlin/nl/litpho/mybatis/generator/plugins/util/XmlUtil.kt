@@ -47,7 +47,7 @@ object XmlUtil {
         val elementRenderer = ElementRenderer()
         throw IllegalStateException(
             "Element ${element.accept(elementRenderer).collect(Collectors.joining())} not found on ${
-            rootElement.accept(elementRenderer).collect(Collectors.joining())}"
+                rootElement.accept(elementRenderer).collect(Collectors.joining())}",
         )
     }
 }

@@ -20,7 +20,7 @@ import org.mybatis.generator.internal.DefaultCommentGenerator
 class BaseRecordClassBuilderFactory(
     private val topLevelClass: TopLevelClass,
     private val introspectedTable: IntrospectedTable,
-    private val namingConfiguration: NamingConfiguration?
+    private val namingConfiguration: NamingConfiguration?,
 ) {
 
     private val commentGenerator: CommentGenerator = DefaultCommentGenerator()
@@ -31,7 +31,7 @@ class BaseRecordClassBuilderFactory(
         removeSetters: Boolean,
         methodPrefix: String,
         useIdGenerators: Boolean,
-        targetRuntime: String
+        targetRuntime: String,
     ) {
         createOrChangeNoArgConstructor(makeConstructorPrivate)
         createFullConstructor(targetRuntime)
@@ -299,7 +299,7 @@ class BaseRecordClassBuilderFactory(
     private fun createParameter(introspectedColumn: IntrospectedColumn, usePrimitivesWherePossible: Boolean): Parameter =
         Parameter(
             PrimitiveUtil.getPrimitive(introspectedColumn, usePrimitivesWherePossible, false),
-            introspectedColumn.javaProperty
+            introspectedColumn.javaProperty,
         ).apply {
             if (introspectedColumn.isNullable) {
                 addAnnotation("@Nullable")
@@ -318,7 +318,7 @@ class BaseRecordClassBuilderFactory(
     private fun determineInitializationString(
         tableConfiguration: NamingConfigurationEntry,
         introspectedColumn: IntrospectedColumn,
-        columnType: FullyQualifiedJavaType
+        columnType: FullyQualifiedJavaType,
     ): String? =
         tableConfiguration.columnDefaultValues[introspectedColumn.actualColumnName].run {
             if (columnType == FullyQualifiedJavaType.getStringInstance()) {

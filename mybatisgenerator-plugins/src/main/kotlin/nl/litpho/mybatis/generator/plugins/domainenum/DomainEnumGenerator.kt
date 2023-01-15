@@ -32,7 +32,7 @@ class DomainEnumGenerator(
     project: String,
     introspectedTable: IntrospectedTable,
     context: Context,
-    private val configuration: DomainEnumConfiguration
+    private val configuration: DomainEnumConfiguration,
 ) : AbstractJavaGenerator(project) {
 
     init {
@@ -71,7 +71,7 @@ class DomainEnumGenerator(
         topLevelEnumeration: TopLevelEnumeration,
         enumType: FullyQualifiedJavaType,
         parameterColumns: List<ParameterColumn>,
-        commentGenerator: CommentGenerator
+        commentGenerator: CommentGenerator,
     ) {
         val constructor = Method(enumType.shortName).apply {
             isConstructor = true
@@ -94,7 +94,7 @@ class DomainEnumGenerator(
     private fun createCheckForNullGetterIfNullable(
         field: Field,
         parameterColumn: ParameterColumn,
-        topLevelEnumeration: TopLevelEnumeration
+        topLevelEnumeration: TopLevelEnumeration,
     ): Method {
         val getter = getGetter(field)
         if (parameterColumn.isNullable) {
@@ -226,7 +226,7 @@ class DomainEnumGenerator(
     private fun addEnumValues(
         topLevelEnumeration: TopLevelEnumeration,
         enumValues: List<Map<String, String>>,
-        parameterColumns: List<ParameterColumn>
+        parameterColumns: List<ParameterColumn>,
     ) {
         val enumConstants: MutableList<String> = mutableListOf()
         for (enumValue: Map<String, String> in enumValues) {
@@ -303,7 +303,7 @@ class DomainEnumGenerator(
             project: String,
             introspectedTable: IntrospectedTable,
             context: Context,
-            configuration: DomainEnumConfiguration
+            configuration: DomainEnumConfiguration,
         ): List<GeneratedJavaFile> =
             DomainEnumGenerator(project, introspectedTable, context, configuration).compilationUnits
                 .map { topLevelEnumeration: CompilationUnit ->
@@ -311,7 +311,7 @@ class DomainEnumGenerator(
                         topLevelEnumeration,
                         context.javaModelGeneratorConfiguration.targetProject,
                         context.getProperty(PropertyRegistry.CONTEXT_JAVA_FILE_ENCODING),
-                        context.javaFormatter
+                        context.javaFormatter,
                     )
                 }
                 .toList()
@@ -321,7 +321,7 @@ class DomainEnumGenerator(
             introspectedTable: IntrospectedTable,
             tableDefinition: DomainEnumTableDefinition,
             context: Context,
-            configuration: DomainEnumConfiguration
+            configuration: DomainEnumConfiguration,
         ): List<GeneratedJavaFile> {
             val generator = DomainEnumGenerator(project, introspectedTable, context, configuration)
             val topLevelEnumerations: List<CompilationUnit> = generator.getCompilationUnits(tableDefinition)
@@ -331,7 +331,7 @@ class DomainEnumGenerator(
                         compilationUnit,
                         context.javaModelGeneratorConfiguration.targetProject,
                         context.getProperty(PropertyRegistry.CONTEXT_JAVA_FILE_ENCODING),
-                        context.javaFormatter
+                        context.javaFormatter,
                     )
                 }
                 .toList()

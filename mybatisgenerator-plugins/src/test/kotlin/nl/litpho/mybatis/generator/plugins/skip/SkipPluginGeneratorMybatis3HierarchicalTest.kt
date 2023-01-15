@@ -33,7 +33,7 @@ class SkipPluginGeneratorMybatis3HierarchicalTest {
             tempDir = createAndCleanDirectory(generatedSourceRoot)
             val props = connectionProperties(
                 "jdbc:h2:file:${tempDir.absolutePath}/db",
-                generatedSourceRoot = generatedSourceRoot
+                generatedSourceRoot = generatedSourceRoot,
             )
             val resourceRoot = "/nl/litpho/mybatis/generator/plugins/skip/mybatis3hierarchical"
             SqlScriptRunner(props).run {
@@ -44,7 +44,7 @@ class SkipPluginGeneratorMybatis3HierarchicalTest {
             val configuration = readConfigurationFromXml(
                 "$resourceRoot/generatorConfig.xml",
                 warnings,
-                props
+                props,
             )
 
             val generator = MyBatisGenerator(configuration, DefaultShellCallback(true), warnings)
@@ -64,7 +64,7 @@ class SkipPluginGeneratorMybatis3HierarchicalTest {
     @Test
     fun `the correct client files should be generated`() {
         tempDir.resolve("java/nl/test/client").listFiles()?.map { f -> f.name } should containExactlyInAnyOrder(
-            "TestMapper.java"
+            "TestMapper.java",
         )
     }
 
@@ -74,14 +74,14 @@ class SkipPluginGeneratorMybatis3HierarchicalTest {
             "Test.java",
             "TestExample.java",
             "TestKey.java",
-            "TestWithBLOBs.java"
+            "TestWithBLOBs.java",
         )
     }
 
     @Test
     fun `the correct resource files should be generated`() {
         tempDir.resolve("resources/nl/test/client").listFiles()?.map { f -> f.name } should containExactlyInAnyOrder(
-            "TestMapper.xml"
+            "TestMapper.xml",
         )
     }
 
@@ -90,7 +90,7 @@ class SkipPluginGeneratorMybatis3HierarchicalTest {
         Stream.of(
             "client/TestMapper.java",
             "model/Test.java",
-            "model/TestExample.java"
+            "model/TestExample.java",
         ).map { fileName ->
             DynamicTest.dynamicTest("$fileName should compile") {
                 tempDir.parseResult("java", "nl", "test", fileName)

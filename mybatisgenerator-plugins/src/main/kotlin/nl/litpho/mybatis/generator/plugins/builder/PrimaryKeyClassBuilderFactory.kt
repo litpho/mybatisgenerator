@@ -38,7 +38,7 @@ object PrimaryKeyClassBuilderFactory {
         topLevelClass: TopLevelClass,
         introspectedTable: IntrospectedTable,
         commentGenerator: CommentGenerator,
-        usePrimitivesWherePossible: Boolean
+        usePrimitivesWherePossible: Boolean,
     ) {
         val baseRecordType = FullyQualifiedJavaType(introspectedTable.primaryKeyType)
         val constructor = Method(baseRecordType.shortName)

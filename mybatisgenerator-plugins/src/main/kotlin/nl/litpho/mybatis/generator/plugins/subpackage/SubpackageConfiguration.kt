@@ -4,14 +4,14 @@ import nl.litpho.mybatis.generator.plugins.PluginConfiguration
 
 data class SubpackageYaml(
     var prefixes: MutableList<Prefix> = mutableListOf(),
-    var subpackages: MutableMap<String, List<String>> = mutableMapOf()
+    var subpackages: MutableMap<String, List<String>> = mutableMapOf(),
 ) {
 
     fun toConfiguration(): SubpackageConfiguration = SubpackageConfiguration(this)
 
     data class Prefix(
         var prefix: String? = null,
-        var subpackage: String? = null
+        var subpackage: String? = null,
     )
 }
 

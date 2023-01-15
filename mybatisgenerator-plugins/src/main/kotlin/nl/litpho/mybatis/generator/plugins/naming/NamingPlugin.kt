@@ -45,7 +45,7 @@ class NamingPlugin : PluginAdapter() {
 
     private fun initializeIntrospectedTable(
         introspectedTable: IntrospectedTable,
-        namingConfigurationEntry: NamingConfigurationEntry
+        namingConfigurationEntry: NamingConfigurationEntry,
     ) {
         val typeName = calculateTypeName(introspectedTable, namingConfigurationEntry)
 
@@ -75,7 +75,7 @@ class NamingPlugin : PluginAdapter() {
 
     private fun calculateTypeName(
         introspectedTable: IntrospectedTable,
-        namingConfigurationEntry: NamingConfigurationEntry
+        namingConfigurationEntry: NamingConfigurationEntry,
     ): String =
         if (namingConfigurationEntry.type == null) {
             val fqjt = FullyQualifiedJavaType(introspectedTable.baseRecordType)

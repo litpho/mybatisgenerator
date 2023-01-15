@@ -67,7 +67,7 @@ class AsciidocPlugin : PluginAdapter() {
                 allTables,
                 domeinEnumPluginConfiguration,
                 skipTablePluginConfiguration,
-                subPackagePluginConfiguration
+                subPackagePluginConfiguration,
             )
             groupModel.calculateTablesToDocument()
             groupModels.add(groupModel)
@@ -83,7 +83,7 @@ class AsciidocPlugin : PluginAdapter() {
                 allTables,
                 domeinEnumPluginConfiguration,
                 skipTablePluginConfiguration,
-                subPackagePluginConfiguration
+                subPackagePluginConfiguration,
             )
             groupModel.calculateTablesLeftToDocument(groupModels)
             groupModels.add(groupModel)
@@ -96,7 +96,7 @@ class AsciidocPlugin : PluginAdapter() {
     private fun generateFiles(
         groupModel: AsciidocGroupModel,
         allTables: Map<String, IntrospectedTable>,
-        tablesPerDiagram: MutableMap<IntrospectedTable, MutableList<String>>
+        tablesPerDiagram: MutableMap<IntrospectedTable, MutableList<String>>,
     ): List<GeneratedXmlFile> {
         val generatedXmlFiles: MutableList<GeneratedXmlFile> = mutableListOf()
         generatedXmlFiles.add(generateDiagram(groupModel, allTables, tablesPerDiagram))
@@ -108,7 +108,7 @@ class AsciidocPlugin : PluginAdapter() {
     private fun generateDiagram(
         groupModel: AsciidocGroupModel,
         allTables: Map<String, IntrospectedTable>,
-        tablesPerDiagram: MutableMap<IntrospectedTable, MutableList<String>>
+        tablesPerDiagram: MutableMap<IntrospectedTable, MutableList<String>>,
     ): GeneratedAsciidocDiagramFile {
         val domeinEnumPluginConfiguration: DomainEnumConfiguration? = getPluginConfigurationNull()
         val subPackagePluginConfiguration: SubpackageConfiguration? = getPluginConfigurationNull()
@@ -122,7 +122,7 @@ class AsciidocPlugin : PluginAdapter() {
             allTables,
             configuration,
             domeinEnumPluginConfiguration,
-            subPackagePluginConfiguration
+            subPackagePluginConfiguration,
         )
         return GeneratedAsciidocDiagramFile(groupModel.group, outputDir, diagram)
     }

@@ -17,7 +17,7 @@ data class AsciidocGroupModel(
     val allTables: Map<String, IntrospectedTable>,
     val domainEnumConfiguration: DomainEnumConfiguration?,
     val skipConfiguration: SkipConfiguration?,
-    val subpackageConfiguration: SubpackageConfiguration?
+    val subpackageConfiguration: SubpackageConfiguration?,
 ) {
 
     val tablesToDocument: SortedSet<IntrospectedTable> =
@@ -90,7 +90,7 @@ data class AsciidocGroupModel(
     private fun parseImportedKeys(
         conn: Connection,
         introspectedTable: IntrospectedTable,
-        subPackagePluginConfiguration: SubpackageConfiguration?
+        subPackagePluginConfiguration: SubpackageConfiguration?,
     ) {
         val importedKeysResultSet =
             conn.metaData.getImportedKeys(conn.catalog, conn.schema, introspectedTable.fullyQualifiedTableNameAtRuntime)
@@ -125,7 +125,7 @@ SELECT TCS.CONSTRAINT_TYPE, TCS.CONSTRAINT_NAME, CCE.COLUMN_NAME, TCS.REMARKS, C
   JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE CCE ON CCE.CONSTRAINT_NAME = TCS.CONSTRAINT_NAME AND TCS.TABLE_NAME = CCE.TABLE_NAME
   LEFT JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE CCE2 ON CCE2.CONSTRAINT_NAME = TCS.CONSTRAINT_NAME AND TCS.TABLE_NAME != CCE2.TABLE_NAME
  WHERE TCS.TABLE_NAME = ?
-            """.trimIndent()
+            """.trimIndent(),
         )
         ps.setString(1, introspectedTable.fullyQualifiedTableNameAtRuntime)
         val rs = ps.executeQuery()
@@ -164,7 +164,7 @@ SELECT TCS.CONSTRAINT_TYPE, TCS.CONSTRAINT_NAME, CCE.COLUMN_NAME, TCS.REMARKS, C
         val name: String,
         val remarks: String?,
         val refTable: String?,
-        var label: String? = null
+        var label: String? = null,
     )
 
     data class ColumnData(val columns: MutableSet<String> = linkedSetOf(), val refColumns: MutableSet<String> = linkedSetOf()) {

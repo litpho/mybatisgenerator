@@ -34,7 +34,7 @@ class NamingPluginGeneratorMybatis3DynamicSqlTest {
             tempDir = createAndCleanDirectory(generatedSourceRoot)
             val props = connectionProperties(
                 "jdbc:h2:file:${tempDir.absolutePath}/db",
-                generatedSourceRoot = generatedSourceRoot
+                generatedSourceRoot = generatedSourceRoot,
             )
             val resourceRoot = "/nl/litpho/mybatis/generator/plugins/naming/mybatis3dynamicsql"
             SqlScriptRunner(props).run {
@@ -45,7 +45,7 @@ class NamingPluginGeneratorMybatis3DynamicSqlTest {
             val configuration = readConfigurationFromXml(
                 "$resourceRoot/generatorConfig.xml",
                 warnings,
-                props
+                props,
             )
 
             val generator = MyBatisGenerator(configuration, DefaultShellCallback(true), warnings)
@@ -70,7 +70,7 @@ class NamingPluginGeneratorMybatis3DynamicSqlTest {
             "DBMyTestDynamicSqlSupport.java",
             "DBMyTestMapper.java",
             "UnrenamedDynamicSqlSupport.java",
-            "UnrenamedMapper.java"
+            "UnrenamedMapper.java",
         )
     }
 
@@ -79,7 +79,7 @@ class NamingPluginGeneratorMybatis3DynamicSqlTest {
         tempDir.resolve("java/nl/test/model").listFiles()?.map { f -> f.name } should containExactlyInAnyOrder(
             "ABTest2.java",
             "DBMyTest.java",
-            "Unrenamed.java"
+            "Unrenamed.java",
         )
     }
 
@@ -99,7 +99,7 @@ class NamingPluginGeneratorMybatis3DynamicSqlTest {
             "client/UnrenamedMapper.java",
             "model/ABTest2.java",
             "model/DBMyTest.java",
-            "model/Unrenamed.java"
+            "model/Unrenamed.java",
         ).map { fileName ->
             DynamicTest.dynamicTest("$fileName should compile") {
                 tempDir.parseResult("java", "nl", "test", fileName)

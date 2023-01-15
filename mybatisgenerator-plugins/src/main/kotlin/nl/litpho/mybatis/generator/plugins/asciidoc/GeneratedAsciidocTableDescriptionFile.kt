@@ -9,7 +9,7 @@ class GeneratedAsciidocTableDescriptionFile(
     group: GroupDefinition,
     targetProject: String,
     private val configuration: AsciidocConfiguration,
-    private val groupModel: AsciidocGroupModel
+    private val groupModel: AsciidocGroupModel,
 ) : GeneratedFlatFile(group.filename + "-table-description.adoc", "", targetProject) {
 
     override fun getFormattedContent(): String {
@@ -73,10 +73,10 @@ class GeneratedAsciidocTableDescriptionFile(
                     .sortedBy { it.key.name }) {
                     sb.append(
                         "|${info.label}|${info.name}|${columnData.columns.joinToString(",")}|${info.refTable}|${
-                        columnData.refColumns.joinToString(
-                            ","
-                        )
-                        }|${info.remarks ?: ""}\n"
+                            columnData.refColumns.joinToString(
+                                ",",
+                            )
+                        }|${info.remarks ?: ""}\n",
                     )
                 }
                 sb.append("|===\n")

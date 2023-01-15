@@ -18,7 +18,7 @@ import org.mybatis.generator.internal.util.JavaBeansUtil
 class UpdateSelectionGenerator(
     project: String,
     introspectedTable: IntrospectedTable,
-    context: Context
+    context: Context,
 ) : AbstractJavaGenerator(project) {
 
     init {

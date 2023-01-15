@@ -22,7 +22,7 @@ class MybatisTypeResolver : JavaTypeResolverDefaultImpl() {
 
     override fun overrideDefaultType(
         column: IntrospectedColumn,
-        defaultType: FullyQualifiedJavaType
+        defaultType: FullyQualifiedJavaType,
     ): FullyQualifiedJavaType {
         if (column.jdbcType == Types.BINARY) {
             return uuidInstance
@@ -48,7 +48,7 @@ class MybatisTypeResolver : JavaTypeResolverDefaultImpl() {
 
     override fun calculateBigDecimalReplacement(
         column: IntrospectedColumn,
-        defaultType: FullyQualifiedJavaType
+        defaultType: FullyQualifiedJavaType,
     ): FullyQualifiedJavaType =
         when (column.scale) {
             0 -> when {

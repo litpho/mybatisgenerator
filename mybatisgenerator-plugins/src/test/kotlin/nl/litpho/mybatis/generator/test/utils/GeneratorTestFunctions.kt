@@ -11,7 +11,7 @@ fun connectionProperties(
     username: String = "sa",
     password: String = "",
     projectDir: String = ".",
-    generatedSourceRoot: String = "$projectDir/build/generatedSources"
+    generatedSourceRoot: String = "$projectDir/build/generatedSources",
 ): Properties =
     Properties().apply {
         this["jdbcUrl"] = jdbcUrl

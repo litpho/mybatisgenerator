@@ -6,7 +6,7 @@ import org.mybatis.generator.api.IntrospectedTable
 data class SkipYaml(
     var ignorePrefixes: MutableList<String> = mutableListOf(),
     var ignoreSuffixes: MutableList<String> = mutableListOf(),
-    var ignoreTables: MutableList<String> = mutableListOf()
+    var ignoreTables: MutableList<String> = mutableListOf(),
 ) {
     fun toConfiguration(): SkipConfiguration = SkipConfiguration(this)
 }

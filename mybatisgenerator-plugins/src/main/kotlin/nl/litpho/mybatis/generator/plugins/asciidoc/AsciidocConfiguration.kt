@@ -6,7 +6,7 @@ import org.mybatis.generator.api.IntrospectedColumn
 data class AsciidocYaml(
     var style: Style = Style(),
     var groups: MutableList<GroupData> = mutableListOf(),
-    var restGroup: GroupData? = null
+    var restGroup: GroupData? = null,
 ) {
 
     fun toConfiguration(): AsciidocConfiguration = AsciidocConfiguration(this)
@@ -16,7 +16,7 @@ data class AsciidocYaml(
         var externalBackgroundColor: String = "LightGrey",
         var enumDotColor: String = "DarkSalmon",
         var tableDotColor: String = "MediumTurquoise",
-        var ortho: Boolean = true
+        var ortho: Boolean = true,
     )
 
     data class GroupData(
@@ -26,7 +26,7 @@ data class AsciidocYaml(
         var includeRecursive: Boolean = false,
         var includeTables: MutableList<String> = mutableListOf(),
         var includePackages: MutableList<String> = mutableListOf(),
-        var excludeTables: MutableList<String> = mutableListOf()
+        var excludeTables: MutableList<String> = mutableListOf(),
     )
 }
 
@@ -43,7 +43,7 @@ class AsciidocConfiguration(configuration: AsciidocYaml) : PluginConfiguration {
                 groupData.includeRecursive,
                 groupData.includeTables,
                 groupData.includePackages,
-                groupData.excludeTables
+                groupData.excludeTables,
             )
         }
 
@@ -55,7 +55,7 @@ class AsciidocConfiguration(configuration: AsciidocYaml) : PluginConfiguration {
             groupData.includeRecursive,
             groupData.includeTables,
             groupData.includePackages,
-            groupData.excludeTables
+            groupData.excludeTables,
         )
     }
 
@@ -69,6 +69,6 @@ class AsciidocConfiguration(configuration: AsciidocYaml) : PluginConfiguration {
         val includeRecursive: Boolean,
         val includeTables: MutableList<String>,
         val includePackages: MutableList<String>,
-        val excludeTables: MutableList<String>
+        val excludeTables: MutableList<String>,
     )
 }

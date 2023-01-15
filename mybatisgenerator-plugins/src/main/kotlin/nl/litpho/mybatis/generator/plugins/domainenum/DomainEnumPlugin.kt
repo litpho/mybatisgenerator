@@ -58,8 +58,8 @@ class DomainEnumPlugin : PluginAdapter() {
                     introspectedTable,
                     configuration.tables.getValue(introspectedTable.fullyQualifiedTableNameAtRuntime),
                     context,
-                    configuration
-                )
+                    configuration,
+                ),
             )
         } else if (isPrefixDomeinEnumTable(introspectedTable)) {
             generatedJavaFiles.addAll(createDomeinEnumForTable(project, introspectedTable, context, configuration))

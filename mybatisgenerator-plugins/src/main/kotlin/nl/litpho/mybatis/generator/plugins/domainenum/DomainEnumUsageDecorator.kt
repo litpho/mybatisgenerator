@@ -17,7 +17,7 @@ class DomainEnumUsageDecorator(private val introspectedTable: IntrospectedTable,
     fun useDomainEnums(
         domainEnumConfiguration: DomainEnumConfiguration,
         namingConfiguration: NamingConfiguration,
-        subpackageConfiguration: SubpackageConfiguration?
+        subpackageConfiguration: SubpackageConfiguration?,
     ) {
         try {
             context.connection.use { conn ->
@@ -33,8 +33,8 @@ class DomainEnumUsageDecorator(private val introspectedTable: IntrospectedTable,
                                     pktableName,
                                     domainEnumConfiguration,
                                     namingConfiguration,
-                                    subpackageConfiguration
-                                )
+                                    subpackageConfiguration,
+                                ),
                             )
                         }
                     }
@@ -49,7 +49,7 @@ class DomainEnumUsageDecorator(private val introspectedTable: IntrospectedTable,
         enumTableName: String,
         domainEnumPluginConfiguration: DomainEnumConfiguration,
         namingConfiguration: NamingConfiguration?,
-        subpackageConfiguration: SubpackageConfiguration?
+        subpackageConfiguration: SubpackageConfiguration?,
     ): String {
         val pakkage: String = determinePackage(enumTableName, domainEnumPluginConfiguration, subpackageConfiguration)
         if (namingConfiguration != null) {
@@ -75,7 +75,7 @@ class DomainEnumUsageDecorator(private val introspectedTable: IntrospectedTable,
     private fun determinePackage(
         enumTableName: String,
         domainEnumConfiguration: DomainEnumConfiguration,
-        subpackageConfiguration: SubpackageConfiguration?
+        subpackageConfiguration: SubpackageConfiguration?,
     ): String =
         domainEnumConfiguration.targetPackage.run {
             val subPackage = subpackageConfiguration?.getSubpackage(enumTableName)

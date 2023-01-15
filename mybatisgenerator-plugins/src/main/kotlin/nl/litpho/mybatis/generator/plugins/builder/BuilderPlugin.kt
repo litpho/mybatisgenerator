@@ -57,7 +57,7 @@ class BuilderPlugin : PluginAdapter() {
             removeSetters,
             methodPrefix,
             useIdGenerators,
-            targetRuntime
+            targetRuntime,
         )
         if (usePrimitivesWherePossible) {
             for (introspectedColumn: IntrospectedColumn in introspectedTable.allColumns) {
@@ -96,7 +96,7 @@ class BuilderPlugin : PluginAdapter() {
     override fun clientUpdateByPrimaryKeySelectiveMethodGenerated(
         method: Method,
         interfaze: Interface,
-        introspectedTable: IntrospectedTable
+        introspectedTable: IntrospectedTable,
     ): Boolean = replaceMethod(introspectedTable, method)
 
     override fun sqlMapUpdateByExampleSelectiveElementGenerated(element: XmlElement, introspectedTable: IntrospectedTable): Boolean {

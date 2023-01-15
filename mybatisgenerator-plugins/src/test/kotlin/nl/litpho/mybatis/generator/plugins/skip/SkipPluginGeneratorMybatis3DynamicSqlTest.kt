@@ -34,7 +34,7 @@ class SkipPluginGeneratorMybatis3DynamicSqlTest {
             tempDir = createAndCleanDirectory(generatedSourceRoot)
             val props = connectionProperties(
                 "jdbc:h2:file:${tempDir.absolutePath}/db",
-                generatedSourceRoot = generatedSourceRoot
+                generatedSourceRoot = generatedSourceRoot,
             )
             val resourceRoot = "/nl/litpho/mybatis/generator/plugins/skip/mybatis3dynamicsql"
             SqlScriptRunner(props).run {
@@ -45,7 +45,7 @@ class SkipPluginGeneratorMybatis3DynamicSqlTest {
             val configuration = readConfigurationFromXml(
                 "$resourceRoot/generatorConfig.xml",
                 warnings,
-                props
+                props,
             )
 
             val generator = MyBatisGenerator(configuration, DefaultShellCallback(true), warnings)
@@ -66,14 +66,14 @@ class SkipPluginGeneratorMybatis3DynamicSqlTest {
     fun `the correct client files should be generated`() {
         tempDir.resolve("java/nl/test/client").listFiles()?.map { f -> f.name } should containExactlyInAnyOrder(
             "TestDynamicSqlSupport.java",
-            "TestMapper.java"
+            "TestMapper.java",
         )
     }
 
     @Test
     fun `the correct model files should be generated`() {
         tempDir.resolve("java/nl/test/model").listFiles()?.map { f -> f.name } should containExactlyInAnyOrder(
-            "Test.java"
+            "Test.java",
         )
     }
 
@@ -87,7 +87,7 @@ class SkipPluginGeneratorMybatis3DynamicSqlTest {
         Stream.of(
             "client/TestDynamicSqlSupport.java",
             "client/TestMapper.java",
-            "model/Test.java"
+            "model/Test.java",
         ).map { fileName ->
             DynamicTest.dynamicTest("$fileName should compile") {
                 tempDir.parseResult("java", "nl", "test", fileName)

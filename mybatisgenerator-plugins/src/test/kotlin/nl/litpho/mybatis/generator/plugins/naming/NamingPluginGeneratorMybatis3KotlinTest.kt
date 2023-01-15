@@ -30,7 +30,7 @@ class NamingPluginGeneratorMybatis3KotlinTest {
             tempDir = createAndCleanDirectory(generatedSourceRoot)
             val props = connectionProperties(
                 "jdbc:h2:file:${tempDir.absolutePath}/db",
-                generatedSourceRoot = generatedSourceRoot
+                generatedSourceRoot = generatedSourceRoot,
             )
             val resourceRoot = "/nl/litpho/mybatis/generator/plugins/naming/mybatis3kotlin"
             SqlScriptRunner(props).run {
@@ -41,7 +41,7 @@ class NamingPluginGeneratorMybatis3KotlinTest {
             val configuration = readConfigurationFromXml(
                 "$resourceRoot/generatorConfig.xml",
                 warnings,
-                props
+                props,
             )
 
             val generator = MyBatisGenerator(configuration, DefaultShellCallback(true), warnings)
@@ -66,7 +66,7 @@ class NamingPluginGeneratorMybatis3KotlinTest {
             "DBMyTestDynamicSqlSupport.kt",
             "DBMyTestMapper.kt",
             "UnrenamedDynamicSqlSupport.kt",
-            "UnrenamedMapper.kt"
+            "UnrenamedMapper.kt",
         )
     }
 
@@ -75,7 +75,7 @@ class NamingPluginGeneratorMybatis3KotlinTest {
         tempDir.resolve("java/nl/test/model").listFiles()?.map { f -> f.name } should containExactlyInAnyOrder(
             "ABTest2.kt",
             "DBMyTest.kt",
-            "Unrenamed.kt"
+            "Unrenamed.kt",
         )
     }
 

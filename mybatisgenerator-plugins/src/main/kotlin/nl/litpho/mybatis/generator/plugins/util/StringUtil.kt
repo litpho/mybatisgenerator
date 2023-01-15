@@ -5,7 +5,7 @@ import java.util.Locale
 fun String.capitalize() = replaceFirstChar {
     if (it.isLowerCase()) {
         it.titlecase(
-            Locale.getDefault()
+            Locale.getDefault(),
         )
     } else {
         it.toString()

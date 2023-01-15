@@ -42,7 +42,7 @@ object UpdateSelectionReplacer {
         rootElement: XmlElement,
         introspectedTable: IntrospectedTable,
         pattern: Pattern,
-        prefix: String
+        prefix: String,
     ) {
         val primaryKeyProperties = getPrimaryKeyProperties(introspectedTable)
         val setElement = findElement(rootElement, "set")

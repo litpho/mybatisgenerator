@@ -9,7 +9,7 @@ import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType
 data class NamingYaml(
     var default: Default? = null,
     var tables: MutableMap<String, Table> = mutableMapOf(),
-    var typeAliases: MutableMap<String, String> = mutableMapOf()
+    var typeAliases: MutableMap<String, String> = mutableMapOf(),
 ) {
 
     fun toConfiguration(): NamingConfiguration = NamingConfiguration(this)
@@ -17,20 +17,20 @@ data class NamingYaml(
     data class Default(
         var prefix: String? = null,
         var columns: MutableMap<String, Column> = mutableMapOf(),
-        var ignoredColumns: MutableList<String> = mutableListOf()
+        var ignoredColumns: MutableList<String> = mutableListOf(),
     )
 
     data class Table(
         var type: String? = null,
         var prefix: String? = null,
         var columns: MutableMap<String, Column> = mutableMapOf(),
-        var ignoredColumns: MutableList<String> = mutableListOf()
+        var ignoredColumns: MutableList<String> = mutableListOf(),
     )
 
     data class Column(
         var type: String? = null,
         var property: String? = null,
-        var defaultValue: String? = null
+        var defaultValue: String? = null,
     )
 }
 
@@ -45,7 +45,7 @@ data class NamingConfiguration(private val namingYaml: NamingYaml) : PluginConfi
                 it.value.ignoredColumns,
                 namingYaml.default?.ignoredColumns,
                 namingYaml.default?.columns,
-                namingYaml.typeAliases
+                namingYaml.typeAliases,
             )
         }.toMap()
 
@@ -62,7 +62,7 @@ class NamingConfigurationEntry(
     ignoredColumns: List<String>,
     defaultIgnoredColumns: List<String>?,
     private val defaultColumns: MutableMap<String, NamingYaml.Column>?,
-    private val typeAliases: MutableMap<String, String>
+    private val typeAliases: MutableMap<String, String>,
 ) {
     val columnOverrides: Map<String, ColumnBasedJavaPropertyOverride> =
         columns.mapValues { ColumnBasedJavaPropertyOverride(it.value.property, it.value.type.applyTypeAlias()) }
@@ -73,7 +73,7 @@ class NamingConfigurationEntry(
                     val override =
                         ColumnBasedJavaPropertyOverride(
                             original?.property ?: defCol.property,
-                            original?.type ?: defCol.type.applyTypeAlias()
+                            original?.type ?: defCol.type.applyTypeAlias(),
                         )
                     map[key] = override
                 }

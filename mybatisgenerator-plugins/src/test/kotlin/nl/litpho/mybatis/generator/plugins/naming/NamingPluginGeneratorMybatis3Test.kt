@@ -33,7 +33,7 @@ class NamingPluginGeneratorMybatis3Test {
             tempDir = createAndCleanDirectory(generatedSourceRoot)
             val props = connectionProperties(
                 "jdbc:h2:file:${tempDir.absolutePath}/db",
-                generatedSourceRoot = generatedSourceRoot
+                generatedSourceRoot = generatedSourceRoot,
             )
             val resourceRoot = "/nl/litpho/mybatis/generator/plugins/naming/mybatis3"
             SqlScriptRunner(props).run {
@@ -44,7 +44,7 @@ class NamingPluginGeneratorMybatis3Test {
             val configuration = readConfigurationFromXml(
                 "$resourceRoot/generatorConfig.xml",
                 warnings,
-                props
+                props,
             )
 
             val generator = MyBatisGenerator(configuration, DefaultShellCallback(true), warnings)
@@ -66,7 +66,7 @@ class NamingPluginGeneratorMybatis3Test {
         tempDir.resolve("java/nl/test/client").listFiles()?.map { f -> f.name } should containExactlyInAnyOrder(
             "ABTest2Mapper.java",
             "DBMyTestMapper.java",
-            "UnrenamedMapper.java"
+            "UnrenamedMapper.java",
         )
     }
 
@@ -78,7 +78,7 @@ class NamingPluginGeneratorMybatis3Test {
             "DBMyTest.java",
             "DBMyTestExample.java",
             "Unrenamed.java",
-            "UnrenamedExample.java"
+            "UnrenamedExample.java",
         )
     }
 
@@ -87,7 +87,7 @@ class NamingPluginGeneratorMybatis3Test {
         tempDir.resolve("resources/nl/test/client").listFiles()?.map { f -> f.name } should containExactlyInAnyOrder(
             "ABTest2Mapper.xml",
             "DBMyTestMapper.xml",
-            "UnrenamedMapper.xml"
+            "UnrenamedMapper.xml",
         )
     }
 
@@ -102,7 +102,7 @@ class NamingPluginGeneratorMybatis3Test {
             "model/DBMyTest.java",
             "model/DBMyTestExample.java",
             "model/Unrenamed.java",
-            "model/UnrenamedExample.java"
+            "model/UnrenamedExample.java",
         ).map { fileName ->
             DynamicTest.dynamicTest("$fileName should compile") {
                 tempDir.parseResult("java", "nl", "test", fileName)

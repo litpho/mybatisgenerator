@@ -30,7 +30,7 @@ class SkipPluginGeneratorMybatis3KotlinTest {
             tempDir = createAndCleanDirectory(generatedSourceRoot)
             val props = connectionProperties(
                 "jdbc:h2:file:${tempDir.absolutePath}/db",
-                generatedSourceRoot = generatedSourceRoot
+                generatedSourceRoot = generatedSourceRoot,
             )
             val resourceRoot = "/nl/litpho/mybatis/generator/plugins/skip/mybatis3kotlin"
             SqlScriptRunner(props).run {
@@ -41,7 +41,7 @@ class SkipPluginGeneratorMybatis3KotlinTest {
             val configuration = readConfigurationFromXml(
                 "$resourceRoot/generatorConfig.xml",
                 warnings,
-                props
+                props,
             )
 
             val generator = MyBatisGenerator(configuration, DefaultShellCallback(true), warnings)
@@ -62,14 +62,14 @@ class SkipPluginGeneratorMybatis3KotlinTest {
     fun `the correct client files should be generated`() {
         tempDir.resolve("java/nl/test/client").listFiles()?.map { f -> f.name } should containExactlyInAnyOrder(
             "TestDynamicSqlSupport.kt",
-            "TestMapper.kt"
+            "TestMapper.kt",
         )
     }
 
     @Test
     fun `the correct model files should be generated`() {
         tempDir.resolve("java/nl/test/model").listFiles()?.map { f -> f.name } should containExactlyInAnyOrder(
-            "Test.kt"
+            "Test.kt",
         )
     }
 

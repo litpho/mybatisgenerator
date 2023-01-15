@@ -26,7 +26,7 @@ open class SkipPlugin : PluginAdapter() {
 
     override fun modelBaseRecordClassGenerated(
         topLevelClass: TopLevelClass,
-        introspectedTable: IntrospectedTable
+        introspectedTable: IntrospectedTable,
     ): Boolean =
         super.modelBaseRecordClassGenerated(topLevelClass, introspectedTable) &&
             !configuration.isIgnored(introspectedTable)
@@ -34,28 +34,28 @@ open class SkipPlugin : PluginAdapter() {
     override fun kotlinDataClassGenerated(
         kotlinFile: KotlinFile,
         dataClass: KotlinType,
-        introspectedTable: IntrospectedTable
+        introspectedTable: IntrospectedTable,
     ): Boolean =
         super.kotlinDataClassGenerated(kotlinFile, dataClass, introspectedTable) &&
             !configuration.isIgnored(introspectedTable)
 
     override fun modelRecordWithBLOBsClassGenerated(
         topLevelClass: TopLevelClass,
-        introspectedTable: IntrospectedTable
+        introspectedTable: IntrospectedTable,
     ): Boolean =
         super.modelRecordWithBLOBsClassGenerated(topLevelClass, introspectedTable) &&
             !configuration.isIgnored(introspectedTable)
 
     override fun modelExampleClassGenerated(
         topLevelClass: TopLevelClass,
-        introspectedTable: IntrospectedTable
+        introspectedTable: IntrospectedTable,
     ): Boolean =
         super.modelExampleClassGenerated(topLevelClass, introspectedTable) &&
             !configuration.isIgnored(introspectedTable)
 
     override fun modelPrimaryKeyClassGenerated(
         topLevelClass: TopLevelClass,
-        introspectedTable: IntrospectedTable
+        introspectedTable: IntrospectedTable,
     ): Boolean =
         super.modelPrimaryKeyClassGenerated(topLevelClass, introspectedTable) &&
             !configuration.isIgnored(introspectedTable)
@@ -68,14 +68,14 @@ open class SkipPlugin : PluginAdapter() {
 
     override fun dynamicSqlSupportGenerated(
         supportClass: TopLevelClass,
-        introspectedTable: IntrospectedTable
+        introspectedTable: IntrospectedTable,
     ): Boolean =
         super.dynamicSqlSupportGenerated(supportClass, introspectedTable) && !configuration.isIgnored(introspectedTable)
 
     override fun mapperGenerated(
         mapperFile: KotlinFile,
         mapper: KotlinType,
-        introspectedTable: IntrospectedTable
+        introspectedTable: IntrospectedTable,
     ): Boolean =
         super.mapperGenerated(mapperFile, mapper, introspectedTable) && !configuration.isIgnored(introspectedTable)
 
@@ -83,7 +83,7 @@ open class SkipPlugin : PluginAdapter() {
         kotlinFile: KotlinFile,
         outerSupportObject: KotlinType,
         innerSupportClass: KotlinType,
-        introspectedTable: IntrospectedTable
+        introspectedTable: IntrospectedTable,
     ): Boolean =
         super.dynamicSqlSupportGenerated(kotlinFile, outerSupportObject, innerSupportClass, introspectedTable) &&
             !configuration.isIgnored(introspectedTable)

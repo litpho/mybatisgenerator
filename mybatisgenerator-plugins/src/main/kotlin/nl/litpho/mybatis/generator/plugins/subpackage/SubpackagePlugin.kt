@@ -53,7 +53,7 @@ class SubpackagePlugin : PluginAdapter() {
             val lastDot = fullyQualifiedType.lastIndexOf('.')
             return appendSuffix(
                 suffix,
-                fullyQualifiedType.substring(0, lastDot)
+                fullyQualifiedType.substring(0, lastDot),
             ) + fullyQualifiedType.substring(lastDot)
         }
 

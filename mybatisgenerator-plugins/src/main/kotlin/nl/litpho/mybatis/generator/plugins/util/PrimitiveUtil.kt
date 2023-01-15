@@ -17,12 +17,12 @@ object PrimitiveUtil {
         FullyQualifiedJavaType("java.lang.Float") to FullyQualifiedJavaType("float"),
         FullyQualifiedJavaType("java.lang.Integer") to FullyQualifiedJavaType.getIntInstance(),
         FullyQualifiedJavaType("java.lang.Long") to FullyQualifiedJavaType("long"),
-        FullyQualifiedJavaType("java.lang.Short") to FullyQualifiedJavaType("short")
+        FullyQualifiedJavaType("java.lang.Short") to FullyQualifiedJavaType("short"),
     )
 
     fun getPrimitive(introspectedColumn: IntrospectedColumn, usePrimitivesWherePossible: Boolean, builder: Boolean): FullyQualifiedJavaType =
         if (!usePrimitivesWherePossible || introspectedColumn.isNullable || introspectedColumn.introspectedTable.primaryKeyColumns.contains(
-                introspectedColumn
+                introspectedColumn,
             )
         ) {
             if (isPrimitivePrimaryKeyColumnForBuilder(introspectedColumn, builder)) {

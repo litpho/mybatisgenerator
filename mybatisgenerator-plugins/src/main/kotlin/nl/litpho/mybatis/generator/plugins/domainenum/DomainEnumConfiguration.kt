@@ -9,7 +9,7 @@ data class DomainEnumYaml(
     var packageSuffix: String? = null,
     var targetPackage: String? = null,
     var prefixes: MutableList<String> = mutableListOf(),
-    var tables: MutableList<TableData> = mutableListOf()
+    var tables: MutableList<TableData> = mutableListOf(),
 ) {
 
     fun toConfiguration(context: Context): DomainEnumConfiguration = DomainEnumConfiguration(this, context)
@@ -21,7 +21,7 @@ data class DomainEnumYaml(
         var orderColumn: String? = null,
         var generateEnumValue: Boolean = false,
         var excludeColumns: MutableList<String> = mutableListOf(),
-        var excludeTypes: MutableList<String> = mutableListOf()
+        var excludeTypes: MutableList<String> = mutableListOf(),
     )
 }
 

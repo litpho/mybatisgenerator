@@ -6,7 +6,7 @@ import nl.litpho.mybatis.generator.plugins.asciidoc.AsciidocConfiguration.GroupD
 class GeneratedAsciidocDiagramFile(
     group: GroupDefinition,
     targetProject: String,
-    private val diagram: PlantUMLDiagram
+    private val diagram: PlantUMLDiagram,
 ) : GeneratedFlatFile("${group.filename}-diagram.adoc", "", targetProject) {
 
     override fun getFormattedContent(): String = diagram.getFormattedContent()
