@@ -106,10 +106,11 @@ class BaseRecordClassBuilderFactory(
         return listOf(initialization)
     }
 
-    private fun determineDefaultValue(introspectedColumn: IntrospectedColumn): String {
-        val defaultValue = introspectedColumn.defaultValue.removeQuotes()
-        val fullyQualifiedName = introspectedColumn.fullyQualifiedJavaType.fullyQualifiedName
-        return when (introspectedColumn.fullyQualifiedJavaType.fullyQualifiedName) {
+    private fun determineDefaultValue(introspectedColumn: IntrospectedColumn): String =
+        determineDefaultValue(introspectedColumn, introspectedColumn.defaultValue.removeQuotes())
+
+    private fun determineDefaultValue(introspectedColumn: IntrospectedColumn, defaultValue: String): String =
+        when (introspectedColumn.fullyQualifiedJavaType.fullyQualifiedName) {
             "java.lang.String" -> "\"" + defaultValue + "\""
             "java.lang.Boolean", "boolean" -> determineDefaultBooleanValue(introspectedColumn, defaultValue)
             "java.lang.Integer", "int" -> defaultValue
@@ -119,16 +120,28 @@ class BaseRecordClassBuilderFactory(
                     "0" -> "BigInteger.ZERO"
                     else -> "BigInteger.valueOf(${defaultValue}L)"
                 }
-
             "java.math.BigDecimal" ->
                 when (defaultValue) {
                     "0" -> "BigDecimal.ZERO"
                     else -> "BigDecimal.valueOf(${defaultValue}L)"
                 }
-
-            else -> determineDefaultValueNamingOverride(fullyQualifiedName, introspectedColumn, defaultValue)
+            "java.time.LocalTime" -> if (defaultValue.endsWith("()")) {
+                defaultValue
+            } else {
+                "LocalTime.parse(\"${defaultValue}\")"
+            }
+            "java.time.LocalDate" -> if (defaultValue.endsWith("()")) {
+                defaultValue
+            } else {
+                "LocalDate.parse(\"${defaultValue}\")"
+            }
+            "java.time.LocalDateTime" -> if (defaultValue.endsWith("()")) {
+                defaultValue
+            } else {
+                "LocalDateTime.parse(\"${defaultValue}\")"
+            }
+            else -> determineDefaultValueNamingOverride(introspectedColumn, defaultValue)
         }
-    }
 
     private fun determineDefaultBooleanValue(introspectedColumn: IntrospectedColumn, defaultValue: String) =
         when (introspectedColumn.jdbcType) {
@@ -148,10 +161,11 @@ class BaseRecordClassBuilderFactory(
                 }
         }
 
-    private fun determineDefaultValueNamingOverride(fullyQualifiedName: String, introspectedColumn: IntrospectedColumn, defaultValue: String) =
+    private fun determineDefaultValueNamingOverride(introspectedColumn: IntrospectedColumn, defaultValue: String) =
         if (namingConfiguration != null) {
             val namingConfigurationEntry =
                 namingConfiguration.getParseResultForType(introspectedColumn.fullyQualifiedJavaType.shortName)
+            val fullyQualifiedName = introspectedColumn.fullyQualifiedJavaType.fullyQualifiedName
             if (namingConfigurationEntry?.type == introspectedColumn.fullyQualifiedJavaType.shortName) {
                 // Vervangen met nabewerking
                 "\$enum$$fullyQualifiedName.$defaultValue\$enum$"
@@ -274,8 +288,26 @@ class BaseRecordClassBuilderFactory(
         }
         for (introspectedColumn: IntrospectedColumn in introspectedTable.nonPrimaryKeyColumns) {
             if (introspectedColumn.defaultValue != null) {
+                val defaultValue = tableConfiguration?.columnDefaultValues?.get(introspectedColumn.actualColumnName)
                 method.addBodyLine("if (${introspectedColumn.javaProperty} == null) {")
-                method.addBodyLine("this.${introspectedColumn.javaProperty} = ${determineDefaultValue(introspectedColumn)};")
+                if (defaultValue == null) {
+                    method.addBodyLine(
+                        "this.${introspectedColumn.javaProperty} = ${
+                            determineDefaultValue(
+                                introspectedColumn,
+                            )
+                        };",
+                    )
+                } else {
+                    method.addBodyLine(
+                        "this.${introspectedColumn.javaProperty} = ${
+                            determineDefaultValue(
+                                introspectedColumn,
+                                defaultValue,
+                            )
+                        };",
+                    )
+                }
                 method.addBodyLine("}")
             }
         }

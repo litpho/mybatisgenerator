@@ -5,8 +5,8 @@ plugins {
     `java-library`
     `maven-publish`
     signing
+    kotlin("jvm") version "1.8.0"
     id("com.diffplug.spotless")
-    id("org.jetbrains.kotlin.jvm")
     id("org.owasp.dependencycheck")
     id("pl.allegro.tech.build.axion-release")
 }
