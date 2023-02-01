@@ -1,7 +1,7 @@
 package nl.litpho.mybatis.generator.plugins.skip
 
 import nl.litpho.mybatis.generator.plugins.util.ConfigurationUtil
-import nl.litpho.mybatis.generator.plugins.util.readConfigurationFromYaml
+import nl.litpho.mybatis.generator.plugins.util.readConfigurationsFromYaml
 import org.mybatis.generator.api.GeneratedXmlFile
 import org.mybatis.generator.api.IntrospectedTable
 import org.mybatis.generator.api.PluginAdapter
@@ -18,7 +18,7 @@ open class SkipPlugin : PluginAdapter() {
         val configurationLocation: String = properties.getProperty("configuration")
             ?: throw RuntimeException("Invalid configuration location for SkipPlugin")
 
-        this.configuration = readConfigurationFromYaml<SkipYaml>(configurationLocation).toConfiguration()
+        this.configuration = readConfigurationsFromYaml(configurationLocation, ::SkipYaml).toConfiguration()
         ConfigurationUtil.addConfiguration(configuration)
 
         return true

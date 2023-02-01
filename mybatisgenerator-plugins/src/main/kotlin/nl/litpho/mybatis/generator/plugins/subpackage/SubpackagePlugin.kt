@@ -1,7 +1,7 @@
 package nl.litpho.mybatis.generator.plugins.subpackage
 
 import nl.litpho.mybatis.generator.plugins.util.ConfigurationUtil
-import nl.litpho.mybatis.generator.plugins.util.readConfigurationFromYaml
+import nl.litpho.mybatis.generator.plugins.util.readConfigurationsFromYaml
 import org.mybatis.generator.api.IntrospectedTable
 import org.mybatis.generator.api.PluginAdapter
 import java.util.Properties
@@ -14,7 +14,7 @@ class SubpackagePlugin : PluginAdapter() {
         val configurationLocation: String = properties.getProperty("configuration")
             ?: throw RuntimeException("Invalid configuration location for SubpackagePlugin")
 
-        this.configuration = readConfigurationFromYaml<SubpackageYaml>(configurationLocation).toConfiguration()
+        this.configuration = readConfigurationsFromYaml(configurationLocation, ::SubpackageYaml).toConfiguration()
         ConfigurationUtil.addConfiguration(configuration)
 
         return true

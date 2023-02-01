@@ -7,7 +7,7 @@ import nl.litpho.mybatis.generator.plugins.subpackage.SubpackageConfiguration
 import nl.litpho.mybatis.generator.plugins.util.ConfigurationUtil
 import nl.litpho.mybatis.generator.plugins.util.ConfigurationUtil.Companion.getPluginConfigurationNull
 import nl.litpho.mybatis.generator.plugins.util.createLogger
-import nl.litpho.mybatis.generator.plugins.util.readConfigurationFromYaml
+import nl.litpho.mybatis.generator.plugins.util.readConfigurationsFromYaml
 import org.mybatis.generator.api.GeneratedJavaFile
 import org.mybatis.generator.api.GeneratedXmlFile
 import org.mybatis.generator.api.IntrospectedTable
@@ -31,7 +31,7 @@ class AsciidocPlugin : PluginAdapter() {
         val configurationLocation: String = properties.getProperty("configuration")
             ?: throw RuntimeException("Invalid configuration location for AsciidocPlugin")
 
-        this.configuration = readConfigurationFromYaml<AsciidocYaml>(configurationLocation).toConfiguration()
+        this.configuration = readConfigurationsFromYaml(configurationLocation, ::AsciidocYaml).toConfiguration()
         ConfigurationUtil.addConfiguration(configuration)
 
         this.outputDir = properties.getProperty(OUTPUT_DIR_PARAMETER) ?: throw RuntimeException("outputDir should not be null")

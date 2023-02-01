@@ -1,11 +1,15 @@
 package nl.litpho.mybatis.generator.plugins.asciidoc
 
+import com.fasterxml.jackson.annotation.JsonMerge
 import nl.litpho.mybatis.generator.plugins.PluginConfiguration
 import org.mybatis.generator.api.IntrospectedColumn
 
 data class AsciidocYaml(
+    @JsonMerge
     var style: Style = Style(),
+    @JsonMerge
     var groups: MutableList<GroupData> = mutableListOf(),
+    @JsonMerge
     var restGroup: GroupData? = null,
 ) {
 
@@ -24,8 +28,11 @@ data class AsciidocYaml(
         var filename: String? = null,
         var rootPackage: String? = null,
         var includeRecursive: Boolean = false,
+        @JsonMerge
         var includeTables: MutableList<String> = mutableListOf(),
+        @JsonMerge
         var includePackages: MutableList<String> = mutableListOf(),
+        @JsonMerge
         var excludeTables: MutableList<String> = mutableListOf(),
     )
 }

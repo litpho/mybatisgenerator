@@ -1,5 +1,6 @@
 package nl.litpho.mybatis.generator.plugins.naming
 
+import com.fasterxml.jackson.annotation.JsonMerge
 import nl.litpho.mybatis.generator.plugins.PluginConfiguration
 import nl.litpho.mybatis.generator.plugins.util.createLogger
 import org.mybatis.generator.api.IntrospectedColumn
@@ -7,8 +8,11 @@ import org.mybatis.generator.api.IntrospectedTable
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType
 
 data class NamingYaml(
+    @JsonMerge
     var default: Default? = null,
+    @JsonMerge
     var tables: MutableMap<String, Table> = mutableMapOf(),
+    @JsonMerge
     var typeAliases: MutableMap<String, String> = mutableMapOf(),
 ) {
 
@@ -16,14 +20,18 @@ data class NamingYaml(
 
     data class Default(
         var prefix: String? = null,
+        @JsonMerge
         var columns: MutableMap<String, Column> = mutableMapOf(),
+        @JsonMerge
         var ignoredColumns: MutableList<String> = mutableListOf(),
     )
 
     data class Table(
         var type: String? = null,
         var prefix: String? = null,
+        @JsonMerge
         var columns: MutableMap<String, Column> = mutableMapOf(),
+        @JsonMerge
         var ignoredColumns: MutableList<String> = mutableListOf(),
     )
 

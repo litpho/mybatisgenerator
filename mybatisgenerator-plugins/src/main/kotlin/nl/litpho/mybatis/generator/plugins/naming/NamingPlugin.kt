@@ -2,7 +2,7 @@ package nl.litpho.mybatis.generator.plugins.naming
 
 import nl.litpho.mybatis.generator.plugins.asciidoc.AsciidocConfiguration
 import nl.litpho.mybatis.generator.plugins.util.ConfigurationUtil
-import nl.litpho.mybatis.generator.plugins.util.readConfigurationFromYaml
+import nl.litpho.mybatis.generator.plugins.util.readConfigurationsFromYaml
 import org.mybatis.generator.api.IntrospectedTable
 import org.mybatis.generator.api.PluginAdapter
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType
@@ -16,7 +16,7 @@ class NamingPlugin : PluginAdapter() {
         val configurationLocation: String = properties.getProperty("configuration")
             ?: throw RuntimeException("Invalid configuration location for NamingPlugin")
 
-        this.configuration = readConfigurationFromYaml<NamingYaml>(configurationLocation).toConfiguration()
+        this.configuration = readConfigurationsFromYaml(configurationLocation, ::NamingYaml).toConfiguration()
         ConfigurationUtil.addConfiguration(configuration)
 
         return true

@@ -29,10 +29,11 @@ tasks.withType<KotlinCompile> {
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
 
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.+")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.+")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.mybatis:mybatis:3.+")
     implementation("org.mybatis.generator:mybatis-generator-core:1.+")
-    implementation("org.yaml:snakeyaml:1.+")
 
     testImplementation("com.github.javaparser:javaparser-core:3.+")
     testImplementation("com.h2database:h2:2.+")

@@ -1,5 +1,6 @@
 package nl.litpho.mybatis.generator.plugins.domainenum
 
+import com.fasterxml.jackson.annotation.JsonMerge
 import nl.litpho.mybatis.generator.plugins.PluginConfiguration
 import org.mybatis.generator.api.IntrospectedTable
 import org.mybatis.generator.config.Context
@@ -8,7 +9,9 @@ import java.util.Optional
 data class DomainEnumYaml(
     var packageSuffix: String? = null,
     var targetPackage: String? = null,
+    @JsonMerge
     var prefixes: MutableList<String> = mutableListOf(),
+    @JsonMerge
     var tables: MutableList<TableData> = mutableListOf(),
 ) {
 
@@ -20,7 +23,9 @@ data class DomainEnumYaml(
         var descriptionColumn: String? = null,
         var orderColumn: String? = null,
         var generateEnumValue: Boolean = false,
+        @JsonMerge
         var excludeColumns: MutableList<String> = mutableListOf(),
+        @JsonMerge
         var excludeTypes: MutableList<String> = mutableListOf(),
     )
 }

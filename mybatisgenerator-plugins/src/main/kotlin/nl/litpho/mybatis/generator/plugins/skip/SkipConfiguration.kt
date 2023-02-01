@@ -1,11 +1,15 @@
 package nl.litpho.mybatis.generator.plugins.skip
 
+import com.fasterxml.jackson.annotation.JsonMerge
 import nl.litpho.mybatis.generator.plugins.PluginConfiguration
 import org.mybatis.generator.api.IntrospectedTable
 
 data class SkipYaml(
+    @JsonMerge
     var ignorePrefixes: MutableList<String> = mutableListOf(),
+    @JsonMerge
     var ignoreSuffixes: MutableList<String> = mutableListOf(),
+    @JsonMerge
     var ignoreTables: MutableList<String> = mutableListOf(),
 ) {
     fun toConfiguration(): SkipConfiguration = SkipConfiguration(this)
