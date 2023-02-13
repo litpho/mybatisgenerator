@@ -114,16 +114,16 @@ class BaseRecordClassBuilderFactory(
             "java.lang.String" -> "\"" + defaultValue + "\""
             "java.lang.Boolean", "boolean" -> determineDefaultBooleanValue(introspectedColumn, defaultValue)
             "java.lang.Integer", "int" -> defaultValue
-            "java.lang.Long", "long" -> "${defaultValue}L"
+            "java.lang.Long", "long" -> "${defaultValue.trim()}L"
             "java.math.BigInteger" ->
                 when (defaultValue) {
                     "0" -> "BigInteger.ZERO"
-                    else -> "BigInteger.valueOf(${defaultValue}L)"
+                    else -> "BigInteger.valueOf(${defaultValue.trim()}L)"
                 }
             "java.math.BigDecimal" ->
                 when (defaultValue) {
                     "0" -> "BigDecimal.ZERO"
-                    else -> "BigDecimal.valueOf(${defaultValue}L)"
+                    else -> "BigDecimal.valueOf(${defaultValue.trim()}L)"
                 }
             "java.time.LocalTime" -> if (defaultValue.endsWith("()")) {
                 defaultValue
