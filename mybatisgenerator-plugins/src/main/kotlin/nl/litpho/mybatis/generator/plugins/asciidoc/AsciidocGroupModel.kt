@@ -1,5 +1,6 @@
 package nl.litpho.mybatis.generator.plugins.asciidoc
 
+import nl.litpho.mybatis.generator.db.MetadataProvider
 import nl.litpho.mybatis.generator.plugins.asciidoc.AsciidocConfiguration.GroupDefinition
 import nl.litpho.mybatis.generator.plugins.domainenum.DomainEnumConfiguration
 import nl.litpho.mybatis.generator.plugins.skip.SkipConfiguration
@@ -118,30 +119,21 @@ data class AsciidocGroupModel(
     }
 
     private fun parseKeyInfo(conn: Connection, introspectedTable: IntrospectedTable) {
-        val ps = conn.prepareStatement(
-            """
-SELECT TCS.CONSTRAINT_TYPE, TCS.CONSTRAINT_NAME, CCE.COLUMN_NAME, TCS.REMARKS, CCE2.TABLE_NAME AS REF_TABLE, CCE2.COLUMN_NAME AS REF_COLUMN
-  FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS TCS
-  JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE CCE ON CCE.CONSTRAINT_NAME = TCS.CONSTRAINT_NAME AND TCS.TABLE_NAME = CCE.TABLE_NAME
-  LEFT JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE CCE2 ON CCE2.CONSTRAINT_NAME = TCS.CONSTRAINT_NAME AND TCS.TABLE_NAME != CCE2.TABLE_NAME
- WHERE TCS.TABLE_NAME = ?
-            """.trimIndent(),
-        )
-        ps.setString(1, introspectedTable.fullyQualifiedTableNameAtRuntime)
-        val rs = ps.executeQuery()
-        while (rs.next()) {
-            val constraintType = rs.getString("CONSTRAINT_TYPE")
-            val constraintName = rs.getString("CONSTRAINT_NAME")
-            val columnName = rs.getString("COLUMN_NAME")
-            val refTableName = rs.getString("REF_TABLE")
-            val refColumnName = rs.getString("REF_COLUMN")
-            val remarks = rs.getString("REMARKS")
-
-            keyInfoMap
-                .computeIfAbsent(introspectedTable) { mutableMapOf() }
-                .computeIfAbsent(KeyInfo(constraintType, constraintName, remarks, refTableName)) { ColumnData() }
-                .add(columnName, refColumnName)
-        }
+        MetadataProvider.getMetadataProvider(conn)
+            ?.getConstraints(conn, introspectedTable.fullyQualifiedTableNameAtRuntime)
+            ?.forEach {
+                keyInfoMap
+                    .computeIfAbsent(introspectedTable) { mutableMapOf() }
+                    .computeIfAbsent(
+                        KeyInfo(
+                            it.constraintType,
+                            it.constraintName,
+                            it.remarks,
+                            it.refTableName,
+                        ),
+                    ) { ColumnData() }
+                    .add(it.columnName, it.refColumnName)
+            }
 
         val map = keyInfoMap[introspectedTable]
         map?.keys?.filter { it.type == "PRIMARY KEY" }?.forEach { it.label = "PK" }
@@ -167,7 +159,10 @@ SELECT TCS.CONSTRAINT_TYPE, TCS.CONSTRAINT_NAME, CCE.COLUMN_NAME, TCS.REMARKS, C
         var label: String? = null,
     )
 
-    data class ColumnData(val columns: MutableSet<String> = linkedSetOf(), val refColumns: MutableSet<String> = linkedSetOf()) {
+    data class ColumnData(
+        val columns: MutableSet<String> = linkedSetOf(),
+        val refColumns: MutableSet<String> = linkedSetOf(),
+    ) {
         fun add(column: String, refColumn: String?) {
             columns.add(column)
             refColumn?.let { refColumns.add(it) }

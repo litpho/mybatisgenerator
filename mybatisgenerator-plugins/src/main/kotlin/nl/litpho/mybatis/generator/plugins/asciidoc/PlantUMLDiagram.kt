@@ -202,16 +202,18 @@ class PlantUMLDiagram(
             }
 
             for (tableName in relationsForTable) {
-                val introspectedForeignTable = allTables.getValue(tableName)
-                val keyPackage = getPackage(introspectedForeignTable.aliasedFullyQualifiedTableNameAtRuntime)
-                val subpackage = getSubpackage(introspectedForeignTable.aliasedFullyQualifiedTableNameAtRuntime)
-                if (shouldIncludeForeignTable(tableName, keyPackage, subpackage, fullRootPackage)) {
-                    includedMap.computeIfAbsent(keyPackage) { HashSet() }.add(introspectedForeignTable)
-                } else {
-                    if (groupModel.includedEnums.contains(tableName)) {
-                        includedMap.computeIfAbsent(NO_PACKAGE) { HashSet() }.add(introspectedForeignTable)
+                val introspectedForeignTable = allTables[tableName]
+                if (introspectedForeignTable != null) {
+                    val keyPackage = getPackage(introspectedForeignTable.aliasedFullyQualifiedTableNameAtRuntime)
+                    val subpackage = getSubpackage(introspectedForeignTable.aliasedFullyQualifiedTableNameAtRuntime)
+                    if (shouldIncludeForeignTable(tableName, keyPackage, subpackage, fullRootPackage)) {
+                        includedMap.computeIfAbsent(keyPackage) { HashSet() }.add(introspectedForeignTable)
                     } else {
-                        excludedMap.computeIfAbsent(keyPackage) { HashSet() }.add(introspectedForeignTable)
+                        if (groupModel.includedEnums.contains(tableName)) {
+                            includedMap.computeIfAbsent(NO_PACKAGE) { HashSet() }.add(introspectedForeignTable)
+                        } else {
+                            excludedMap.computeIfAbsent(keyPackage) { HashSet() }.add(introspectedForeignTable)
+                        }
                     }
                 }
             }
