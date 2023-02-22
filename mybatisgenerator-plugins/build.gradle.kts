@@ -8,7 +8,6 @@ plugins {
     kotlin("jvm") version "1.8.0"
     id("com.diffplug.spotless")
     id("org.owasp.dependencycheck")
-    id("pl.allegro.tech.build.axion-release")
 }
 
 java {

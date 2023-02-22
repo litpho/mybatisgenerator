@@ -18,7 +18,7 @@ object PrimaryKeyClassBuilderFactory {
         createNoArgConstructor(topLevelClass, introspectedTable, commentGenerator)
         createFullConstructor(topLevelClass, introspectedTable, commentGenerator, usePrimitivesWherePossible)
         with(topLevelClass) {
-            addImportedType("javax.annotation.Nullable")
+            addImportedType("jakarta.annotation.Nullable")
             addStaticImport("java.util.Objects.requireNonNull")
         }
     }

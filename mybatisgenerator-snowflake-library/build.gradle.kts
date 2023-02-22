@@ -5,7 +5,6 @@ plugins {
     signing
     id("com.diffplug.spotless")
     id("org.owasp.dependencycheck")
-    id("pl.allegro.tech.build.axion-release")
 }
 
 dependencies {

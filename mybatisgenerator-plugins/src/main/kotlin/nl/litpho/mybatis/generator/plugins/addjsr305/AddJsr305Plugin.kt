@@ -17,7 +17,7 @@ class AddJsr305Plugin : PluginAdapter() {
     override fun modelBaseRecordClassGenerated(topLevelClass: TopLevelClass, introspectedTable: IntrospectedTable): Boolean {
         with(topLevelClass) {
             addStaticImport("java.util.Objects.requireNonNull")
-            addImportedType("javax.annotation.Nullable")
+            addImportedType("jakarta.annotation.Nullable")
         }
         for (method in topLevelClass.methods) {
             if (!method.isGetter() && !method.isSetter()) {

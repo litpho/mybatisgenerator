@@ -12,16 +12,33 @@ plugins {
     id("pl.allegro.tech.build.axion-release") version("1.+")
 }
 
-allprojects {
-    plugins.withType(ReleasePlugin::class) {
-        project.version = scmVersion.version
+plugins.withType(ReleasePlugin::class) {
+    allprojects {
+        project.version = rootProject.scmVersion.version
     }
+}
 
+allprojects {
     repositories {
         mavenCentral()
     }
 
     dependencyLocking {
         lockAllConfigurations()
+    }
+}
+
+tasks.register("resolveAndLockAll") {
+    group = "Build"
+    description = "Write and update all dependency locks"
+    doFirst {
+        require(gradle.startParameter.isWriteDependencyLocks)
+    }
+    doLast {
+        allprojects.forEach { p ->
+            p.configurations.filter {
+                it.isCanBeResolved
+            }.forEach { it.resolve() }
+        }
     }
 }

@@ -35,7 +35,7 @@ class UpdateSelectionGenerator(
             visibility = JavaVisibility.PUBLIC
             addSuperInterface(superInterface)
             addImportedType("nl.litpho.mybatis.dto.UpdateSelection")
-            addImportedType("javax.annotation.CheckForNull")
+            addImportedType("jakarta.annotation.Nullable")
         }
         commentGenerator.addJavaFileComment(topLevelClass)
 
@@ -106,7 +106,7 @@ class UpdateSelectionGenerator(
     private fun IntrospectedColumn.createField(): Field =
         Field(javaProperty, primitiveColumn()).apply {
             visibility = JavaVisibility.PRIVATE
-            addAnnotation("@CheckForNull")
+            addAnnotation("@Nullable")
         }
 
     private fun createUpdateFields(): List<Field> =
@@ -218,7 +218,7 @@ class UpdateSelectionGenerator(
             addBodyLine("return ${field.name};")
 
             if (FullyQualifiedJavaType.getBooleanPrimitiveInstance() != field.type) {
-                addAnnotation("@CheckForNull")
+                addAnnotation("@Nullable")
             }
         }
 

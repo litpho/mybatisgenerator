@@ -18,7 +18,7 @@ import org.mybatis.generator.config.PropertyRegistry
 import java.sql.SQLException
 import java.util.Locale
 
-private const val CHECK_FOR_NULL: String = "@CheckForNull"
+private const val NULLABLE: String = "@Nullable"
 
 private const val CODE: String = "CODE"
 
@@ -54,7 +54,7 @@ class DomainEnumGenerator(
         if (parameterColumns.isNotEmpty()) {
             for (parameterColumn: ParameterColumn in parameterColumns) {
                 val field = createPrivateFinalField(parameterColumn)
-                val getter = createCheckForNullGetterIfNullable(field, parameterColumn, topLevelEnumeration)
+                val getter = createNullableGetterIfNullable(field, parameterColumn, topLevelEnumeration)
                 with(topLevelEnumeration) {
                     addField(field)
                     addMethod(getter)
@@ -79,7 +79,7 @@ class DomainEnumGenerator(
         for (parameterColumn: ParameterColumn in parameterColumns) {
             val parameter = Parameter(parameterColumn.fullyQualifiedJavaType, parameterColumn.javaProperty).apply {
                 if (parameterColumn.isNullable) {
-                    addAnnotation(CHECK_FOR_NULL)
+                    addAnnotation(NULLABLE)
                 }
             }
             with(constructor) {
@@ -91,16 +91,16 @@ class DomainEnumGenerator(
         commentGenerator.addGeneralMethodComment(constructor, introspectedTable)
     }
 
-    private fun createCheckForNullGetterIfNullable(
+    private fun createNullableGetterIfNullable(
         field: Field,
         parameterColumn: ParameterColumn,
         topLevelEnumeration: TopLevelEnumeration,
     ): Method {
         val getter = getGetter(field)
         if (parameterColumn.isNullable) {
-            field.addAnnotation(CHECK_FOR_NULL)
-            getter.addAnnotation(CHECK_FOR_NULL)
-            topLevelEnumeration.addImportedType(FullyQualifiedJavaType("javax.annotation.CheckForNull"))
+            field.addAnnotation(NULLABLE)
+            getter.addAnnotation(NULLABLE)
+            topLevelEnumeration.addImportedType(FullyQualifiedJavaType("jakarta.annotation.Nullable"))
         }
         return getter
     }
@@ -151,7 +151,7 @@ class DomainEnumGenerator(
         if (parameterColumns.isNotEmpty()) {
             for (parameterColumn: ParameterColumn in parameterColumns) {
                 val field = createPrivateFinalField(parameterColumn)
-                val getter = createCheckForNullGetterIfNullable(field, parameterColumn, topLevelEnumeration)
+                val getter = createNullableGetterIfNullable(field, parameterColumn, topLevelEnumeration)
                 if (DATABASE_VALUE.equals(parameterColumn.actualColumnName, ignoreCase = true) ||
                     OMSCHRIJVING.equals(parameterColumn.actualColumnName, ignoreCase = true)
                 ) {
