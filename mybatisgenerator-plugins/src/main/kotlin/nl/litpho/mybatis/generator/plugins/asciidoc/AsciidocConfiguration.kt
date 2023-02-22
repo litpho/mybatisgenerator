@@ -39,7 +39,7 @@ data class AsciidocYaml(
 
 class AsciidocConfiguration(configuration: AsciidocYaml) : PluginConfiguration {
 
-    val style: AsciidocYaml.Style? = configuration.style
+    val style: AsciidocYaml.Style = configuration.style
 
     val groups: List<GroupDefinition> = configuration.groups
         .map { groupData ->

@@ -47,7 +47,7 @@ class BuilderPlugin : PluginAdapter() {
 
     override fun modelBaseRecordClassGenerated(topLevelClass: TopLevelClass, introspectedTable: IntrospectedTable): Boolean {
         baseRecordClasses.add(topLevelClass)
-        val namingConfiguration: NamingConfiguration? = ConfigurationUtil.getPluginConfigurationNull<NamingConfiguration>()
+        val namingConfiguration: NamingConfiguration? = ConfigurationUtil.getPluginConfigurationNull()
         val factory =
             BaseRecordClassBuilderFactory(topLevelClass, introspectedTable, namingConfiguration)
         val targetRuntime: String = context.targetRuntime
