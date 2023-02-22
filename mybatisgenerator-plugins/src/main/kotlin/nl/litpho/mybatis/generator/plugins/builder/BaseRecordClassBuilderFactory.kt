@@ -115,6 +115,8 @@ class BaseRecordClassBuilderFactory(
             "java.lang.Boolean", "boolean" -> determineDefaultBooleanValue(introspectedColumn, defaultValue)
             "java.lang.Integer", "int" -> defaultValue
             "java.lang.Long", "long" -> "${defaultValue.trim()}L"
+            "java.lang.Double", "double" -> "${defaultValue.trim()}D"
+            "java.lang.Float", "float" -> "${defaultValue.trim()}F"
             "java.math.BigInteger" ->
                 when (defaultValue) {
                     "0" -> "BigInteger.ZERO"
